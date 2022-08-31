@@ -5,6 +5,7 @@ until game:IsLoaded()
 --Libraries/Require
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Loco-CTO/Jailbreak-Vision/main/UI-Lib/Custom-Mercury.lua"))()
 local tweenService = game:GetService("TweenService")
+local mouse = game:GetService("Players").LocalPlayer:GetMouse()
 
 --Folders Handle
 local assetFolder = Instance.new("Folder")
@@ -305,6 +306,7 @@ local playerVehicle = nil
 local SurfaceGUI
 local ScreenGUI
 local vehicleRPM
+local vehicleForward
 
 --Value
 
@@ -324,7 +326,6 @@ local function getPlayerVehicle()
 end
 
 local function checkIfAutomatic()
-    getPlayerVehicle()
     local numOfSound = 0
     for i, v in ipairs(playerVehicle.Engine:GetChildren()) do
         if v.Name == "Sound" then
@@ -340,29 +341,32 @@ end
 
 local function calGear()
     local automatic = checkIfAutomatic()
-    if automatic then
-        return 1
-    else
-        if vehicleRPM > 1250 then
-            return 6
-        elseif vehicleRPM > 1000 then
-            return 5
-        elseif vehicleRPM > 750 then
-            return 4
-        elseif vehicleRPM > 500 then
-            return 3
-        elseif vehicleRPM > 250 then
-            return 2
-        elseif vehicleRPM > 0 then
+    if vehicleForward then
+        if automatic then
             return 1
-        else 
-            return 1
+        else
+            if vehicleRPM > 1250 then
+                return 6
+            elseif vehicleRPM > 1000 then
+                return 5
+            elseif vehicleRPM > 750 then
+                return 4
+            elseif vehicleRPM > 500 then
+                return 3
+            elseif vehicleRPM > 250 then
+                return 2
+            elseif vehicleRPM > 0 then
+                return 1
+            else 
+                return 1
+            end
         end
+    else
+        return 1
     end
 end
 
 local function calRPM()
-    getPlayerVehicle()
     task.wait(0.1)
     local diameter = playerVehicle:WaitForChild("WheelFrontRight"):WaitForChild("Wheel").Size.Z
     local circumference = diameter*3.14
@@ -377,7 +381,6 @@ local function modern3dspeedometer()
     if modern3dspeedometerEnable then
         task.wait(0.5)
         if OnVehicle then
-            getPlayerVehicle()
             if playerVehicle ~= nil then
                 calRPM()
                 if not playerVehicle.Model.Body:FindFirstChild("Speedometer") then
@@ -448,7 +451,7 @@ local function modernspeedometer()
         task.wait(0.5)
         local tweenInfo = TweenInfo.new(2)
         if OnVehicle then
-            calRPM(playerVehicle)
+            calRPM()
             if not game.Players.LocalPlayer.PlayerGui:FindFirstChild("ScreenGui") then
                 ScreenGUI = assetFolder.ScreenGui:Clone()
                 ScreenGUI.Parent = game.Players.LocalPlayer.PlayerGui
@@ -509,10 +512,12 @@ local function modernspeedometer()
     end
 end
 
---Connect Event
+--Handler
 game.Players.LocalPlayer.PlayerGui.AppUI.ChildAdded:Connect(function(gui)
     if gui.name == "Speedometer" then
         OnVehicle = true
+        getPlayerVehicle()
+        task.wait(0.1)
         modern3dspeedometer()
         modernspeedometer()
     end
@@ -521,10 +526,22 @@ end)
 game.Players.LocalPlayer.PlayerGui.AppUI.ChildRemoved:Connect(function(gui)
     if gui.name == "Speedometer" then
         OnVehicle = false
+        getPlayerVehicle()
+        task.wait(0.1)
         modern3dspeedometer()
         modernspeedometer()
     end
 end)
+
+local function keyHandler(key)
+    if key =='w' then
+        vehicleForward = true
+    elseif key =='s' then
+        vehicleForward = false
+    end
+end
+
+mouse.KeyDown:Connect(keyHandler)
 
 --GUI
 local GUI = Library:Create{
