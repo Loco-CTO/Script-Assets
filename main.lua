@@ -3,7 +3,7 @@ repeat
 until game:IsLoaded()
 
 --Libraries/Require
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/mcKTS/Jailbreak-Vision/main/Lib/Custom-Mercury.lua?token=GHSAT0AAAAAABX2FNXLILOWEY4RZDQQR5KIYYNJWJA"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Loco-CTO/Jailbreak-Vision/main/UI-Lib/Custom-Mercury.lua"))()
 local tweenService = game:GetService("TweenService")
 
 --Folders Handle
