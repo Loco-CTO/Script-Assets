@@ -304,74 +304,19 @@ local modernspeedometerEnable = true
 local playerVehicle = nil
 local SurfaceGUI
 local ScreenGUI
-local vehicleRPM
 
 --Value
 
 --Functions
-local function round(num)
-    if num then
-        return num>=0 and math.floor(num+0.5) or math.ceil(num-0.5)
-    end
-end
-
 local function getPlayerVehicle()
     for i, vehicle in pairs(game.Workspace.Vehicles:GetChildren()) do
+        print(vehicle.Seat:WaitForChild("PlayerName").Value.." - "..game:GetService("Players").LocalPlayer.Name)
         if vehicle.Seat:WaitForChild("PlayerName").Value == game:GetService("Players").LocalPlayer.Name then
             playerVehicle = vehicle
         end
     end
 end
 
-local function checkIfAutomatic()
-    getPlayerVehicle()
-    local numOfSound = 0
-    for i, v in ipairs(playerVehicle.Engine:GetChildren()) do
-        if v.Name == "Sound" then
-            numOfSound += 1
-        end
-    end
-    if numOfSound == 1 or numOfSound == 2 then
-        return true
-    else
-        return false
-    end
-end
-
-local function calGear()
-    local automatic = checkIfAutomatic()
-    if automatic then
-        return 1
-    else
-        if vehicleRPM > 1250 then
-            return 6
-        elseif vehicleRPM > 1000 then
-            return 5
-        elseif vehicleRPM > 750 then
-            return 4
-        elseif vehicleRPM > 500 then
-            return 3
-        elseif vehicleRPM > 250 then
-            return 2
-        elseif vehicleRPM > 0 then
-            return 1
-        else 
-            return 1
-        end
-    end
-end
-
-local function calRPM()
-    getPlayerVehicle()
-    task.wait(0.1)
-    local diameter = playerVehicle:WaitForChild("WheelFrontRight"):WaitForChild("Wheel").Size.Z
-    local circumference = diameter*3.14
-    local currentPos = playerVehicle.WheelFrontRight.Wheel.Position
-    task.wait(1)
-    local distancetraveled = (currentPos-playerVehicle.WheelFrontRight.Wheel.Position).Magnitude
-    local RPM = (distancetraveled/circumference) * 60
-    vehicleRPM = round(RPM)
-end
 
 local function modern3dspeedometer()
     if modern3dspeedometerEnable then
@@ -379,7 +324,6 @@ local function modern3dspeedometer()
         if OnVehicle then
             getPlayerVehicle()
             if playerVehicle ~= nil then
-                calRPM()
                 if not playerVehicle.Model.Body:FindFirstChild("Speedometer") then
                     local vehicle = playerVehicle
                     local part = Instance.new("Part")
@@ -418,10 +362,7 @@ local function modern3dspeedometer()
             task.wait(0.1)
             print("Made 3D Speedometer")
             while OnVehicle do
-                coroutine.warp(function()
-                    playerVehicle.Model.Body.Speedometer.SurfaceGui.Speedometer.Top.Speed.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
-                    calRPM()
-                end)
+                playerVehicle.Model.Body.Speedometer.SurfaceGui.Speedometer.Top.Speed.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
                 task.wait(1/30)
             end
         else
@@ -448,7 +389,6 @@ local function modernspeedometer()
         task.wait(0.5)
         local tweenInfo = TweenInfo.new(2)
         if OnVehicle then
-            calRPM(playerVehicle)
             if not game.Players.LocalPlayer.PlayerGui:FindFirstChild("ScreenGui") then
                 ScreenGUI = assetFolder.ScreenGui:Clone()
                 ScreenGUI.Parent = game.Players.LocalPlayer.PlayerGui
@@ -469,27 +409,10 @@ local function modernspeedometer()
             end
             game.Players.LocalPlayer.PlayerGui.AppUI.Enabled = false
             game.Players.LocalPlayer.PlayerGui.HotbarGui.Enabled = false
-            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.UIAspectRatioConstraint:Destroy()
             task.wait(0.1)
             while OnVehicle do
-                local gear = calGear()
-                task.wait(1/60)
-                task.spawn(function()
-                    game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Gear.Text = "<i>"..gear.."</i>"
-                    game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Speed.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
-                    calRPM()
-                    if vehicleRPM > 1800 then
-                        if vehicleRPM < 1901 then
-                            local saturation = 1900-vehicleRPM
-                            local satCal = 1 - saturation/100
-                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.BackgroundColor3 = Color3.fromHSV(0.0, satCal, 1)
-                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.Size = UDim2.new(1, 0, 1, 0)
-                        end
-                    elseif vehicleRPM < 1801 then
-                        game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.BackgroundColor3 = Color3.fromHSV(0, 0.0, 1)
-                        game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.Size = UDim2.new(vehicleRPM/1800, 0, 1, 0)
-                    end
-                end)
+                game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Speed.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
+                task.wait(1/30)
             end
         else
             game.Players.LocalPlayer.PlayerGui.AppUI.Enabled = true
