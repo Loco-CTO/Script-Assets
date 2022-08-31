@@ -1,6 +1,4 @@
-repeat
-    task.wait(1)
-until game:IsLoaded()
+repeat task.wait(1) until game:IsLoaded()
 
 --Libraries/Require
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Loco-CTO/Jailbreak-Vision/main/UI-Lib/Custom-Mercury.lua"))()
@@ -25,41 +23,52 @@ TextLabel5 = Instance.new("TextLabel")
 UIAspectRatioConstraint6 = Instance.new("UIAspectRatioConstraint")
 TextLabel7 = Instance.new("TextLabel")
 UIAspectRatioConstraint8 = Instance.new("UIAspectRatioConstraint")
-UIAspectRatioConstraint9 = Instance.new("UIAspectRatioConstraint")
-Frame10 = Instance.new("Frame")
-Frame11 = Instance.new("Frame")
-Frame12 = Instance.new("Frame")
-Frame13 = Instance.new("Frame")
+TextLabel9 = Instance.new("TextLabel")
+UIAspectRatioConstraint10 = Instance.new("UIAspectRatioConstraint")
+TextLabel11 = Instance.new("TextLabel")
+UIAspectRatioConstraint12 = Instance.new("UIAspectRatioConstraint")
+TextLabel13 = Instance.new("TextLabel")
 UIAspectRatioConstraint14 = Instance.new("UIAspectRatioConstraint")
 UIAspectRatioConstraint15 = Instance.new("UIAspectRatioConstraint")
-UIAspectRatioConstraint16 = Instance.new("UIAspectRatioConstraint")
-UIAspectRatioConstraint17 = Instance.new("UIAspectRatioConstraint")
-UIPadding18 = Instance.new("UIPadding")
-UIAspectRatioConstraint19 = Instance.new("UIAspectRatioConstraint")
-ScreenGui0.Name = "ScreenGui"
+Frame16 = Instance.new("Frame")
+Frame17 = Instance.new("Frame")
+Frame18 = Instance.new("Frame")
+Frame19 = Instance.new("Frame")
+UIAspectRatioConstraint20 = Instance.new("UIAspectRatioConstraint")
+UIAspectRatioConstraint21 = Instance.new("UIAspectRatioConstraint")
+Frame22 = Instance.new("Frame")
+UIAspectRatioConstraint23 = Instance.new("UIAspectRatioConstraint")
+UIAspectRatioConstraint24 = Instance.new("UIAspectRatioConstraint")
+UIAspectRatioConstraint25 = Instance.new("UIAspectRatioConstraint")
+UIAspectRatioConstraint26 = Instance.new("UIAspectRatioConstraint")
+UIPadding27 = Instance.new("UIPadding")
+UIGradient = Instance.new("UIGradient")
 ScreenGui0.Parent = mas
 ScreenGui0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 Frame1.Name = "Speedometer"
 Frame1.Parent = ScreenGui0
-Frame1.Position = UDim2.new(0.743211806, 0, 0.751252115, 0)
-Frame1.Size = UDim2.new(0.249804839, 0, 0.228714526, 0)
+Frame1.Position = UDim2.new(0.738756597, 0, 0.771196842, 0)
+Frame1.Size = UDim2.new(0.275862068, 0, 0.228714526, 0)
 Frame1.BackgroundColor = BrickColor.new("Institutional white")
 Frame1.BackgroundColor3 = Color3.new(1, 1, 1)
 Frame1.BackgroundTransparency = 1
 Frame2.Name = "Top"
 Frame2.Parent = Frame1
-Frame2.Position = UDim2.new(0.278125018, 0, 0.197080299, 0)
-Frame2.Size = UDim2.new(0.593511343, 0, 0.545633733, 0)
+Frame2.Position = UDim2.new(0.28125, 0, 0.197080299, 0)
+Frame2.Size = UDim2.new(0.612500012, 0, 0.562043786, 0)
 Frame2.BackgroundColor = BrickColor.new("Olivine")
 Frame2.BackgroundColor3 = Color3.new(0.333333, 1, 0.498039)
 Frame2.BackgroundTransparency = 1
 TextLabel3.Name = "Speed"
 TextLabel3.Parent = Frame2
-TextLabel3.Position = UDim2.new(0.162012488, 0, -0.240115777, 0)
-TextLabel3.Size = UDim2.new(0.663265288, 0, 1.40259731, 0)
+TextLabel3.Position = UDim2.new(0.223379642, 0, -0.0519480519, 0)
+TextLabel3.Size = UDim2.new(0.607142866, 0, 1.2337662, 0)
 TextLabel3.BackgroundColor = BrickColor.new("Institutional white")
 TextLabel3.BackgroundColor3 = Color3.new(1, 1, 1)
 TextLabel3.BackgroundTransparency = 1
+TextLabel3.BorderColor3 = Color3.new(0.207843, 0.207843, 0.207843)
+TextLabel3.BorderSizePixel = 16
+TextLabel3.ZIndex = 2
 TextLabel3.Font = Enum.Font.SourceSansLight
 TextLabel3.FontSize = Enum.FontSize.Size96
 TextLabel3.Text = "<i>000</i>"
@@ -67,39 +76,46 @@ TextLabel3.TextColor = BrickColor.new("Institutional white")
 TextLabel3.TextColor3 = Color3.new(1, 1, 1)
 TextLabel3.TextScaled = true
 TextLabel3.TextSize = 100
-TextLabel3.TextTransparency = 0.5
+TextLabel3.TextStrokeColor3 = Color3.new(0.298039, 0.298039, 0.298039)
+TextLabel3.TextTransparency = 0.20000000298023224
 TextLabel3.TextWrap = true
 TextLabel3.TextWrapped = true
 TextLabel3.RichText = true
 UIAspectRatioConstraint4.Parent = TextLabel3
-UIAspectRatioConstraint4.AspectRatio = 0.9688636660575867
+UIAspectRatioConstraint4.AspectRatio = 1.2526315450668335
 TextLabel5.Name = "Format"
 TextLabel5.Parent = Frame2
-TextLabel5.Position = UDim2.new(0.790816367, 0, 0.597402632, 0)
-TextLabel5.Size = UDim2.new(0.209183648, 0, 0.376623333, 0)
+TextLabel5.Position = UDim2.new(0.783323944, 0, 0.692909122, 0)
+TextLabel5.Size = UDim2.new(0.183673471, 0, 0.324675292, 0)
 TextLabel5.BackgroundColor = BrickColor.new("Institutional white")
 TextLabel5.BackgroundColor3 = Color3.new(1, 1, 1)
 TextLabel5.BackgroundTransparency = 1
+TextLabel5.BorderColor3 = Color3.new(0.207843, 0.207843, 0.207843)
+TextLabel5.BorderSizePixel = 16
 TextLabel5.Font = Enum.Font.Oswald
 TextLabel5.FontSize = Enum.FontSize.Size24
-TextLabel5.Text = "<i><b><u>MP/H</u></b></i>"
+TextLabel5.Text = "<i><b>MPH</b></i>"
 TextLabel5.TextColor = BrickColor.new("Institutional white")
 TextLabel5.TextColor3 = Color3.new(1, 1, 1)
 TextLabel5.TextScaled = true
 TextLabel5.TextSize = 19
-TextLabel5.TextTransparency = 0.5
+TextLabel5.TextStrokeColor3 = Color3.new(0.298039, 0.298039, 0.298039)
+TextLabel5.TextTransparency = 0.20000000298023224
 TextLabel5.TextWrap = true
 TextLabel5.TextWrapped = true
 TextLabel5.RichText = true
 UIAspectRatioConstraint6.Parent = TextLabel5
-UIAspectRatioConstraint6.AspectRatio = 1.1379649639129639
+UIAspectRatioConstraint6.AspectRatio = 1.440000057220459
 TextLabel7.Name = "Gear"
 TextLabel7.Parent = Frame2
-TextLabel7.Position = UDim2.new(-0.0418614633, 0, 0.318325847, 0)
-TextLabel7.Size = UDim2.new(0.275510192, 0, 0.688311517, 0)
+TextLabel7.Position = UDim2.new(0.0357142873, 0, 0.602000058, 0)
+TextLabel7.Size = UDim2.new(0.183673471, 0, 0.44155845, 0)
 TextLabel7.BackgroundColor = BrickColor.new("Institutional white")
 TextLabel7.BackgroundColor3 = Color3.new(1, 1, 1)
 TextLabel7.BackgroundTransparency = 1
+TextLabel7.BorderColor3 = Color3.new(0.207843, 0.207843, 0.207843)
+TextLabel7.BorderSizePixel = 16
+TextLabel7.ZIndex = 2
 TextLabel7.Font = Enum.Font.GothamMedium
 TextLabel7.FontSize = Enum.FontSize.Size36
 TextLabel7.LineHeight = 0.8999999761581421
@@ -108,56 +124,139 @@ TextLabel7.TextColor = BrickColor.new("Institutional white")
 TextLabel7.TextColor3 = Color3.new(1, 1, 1)
 TextLabel7.TextScaled = true
 TextLabel7.TextSize = 35
-TextLabel7.TextTransparency = 0.5
+TextLabel7.TextStrokeColor3 = Color3.new(0.298039, 0.298039, 0.298039)
+TextLabel7.TextTransparency = 0.20000000298023224
 TextLabel7.TextWrap = true
 TextLabel7.TextWrapped = true
 TextLabel7.RichText = true
 UIAspectRatioConstraint8.Parent = TextLabel7
-UIAspectRatioConstraint8.AspectRatio = 0.8200890421867371
-UIAspectRatioConstraint9.Parent = Frame2
-UIAspectRatioConstraint9.AspectRatio = 2.048841714859009
-Frame10.Name = "Bottom"
-Frame10.Parent = Frame1
-Frame10.Position = UDim2.new(0.278125018, 0, 0.5182482, 0)
-Frame10.Size = UDim2.new(0.593511343, 0, 0.403910697, 0)
-Frame10.BackgroundColor = BrickColor.new("Institutional white")
-Frame10.BackgroundColor3 = Color3.new(1, 1, 1)
-Frame10.BackgroundTransparency = 1
-Frame11.Name = "Meter"
-Frame11.Parent = Frame10
-Frame11.Position = UDim2.new(-0.0612244941, 0, 0.122807026, 0)
-Frame11.Size = UDim2.new(1.10204077, 0, 0.771929801, 0)
-Frame11.BackgroundColor = BrickColor.new("Institutional white")
-Frame11.BackgroundColor3 = Color3.new(1, 1, 1)
-Frame11.BackgroundTransparency = 1
-Frame12.Name = "BarBackground"
-Frame12.Parent = Frame11
-Frame12.Position = UDim2.new(-0.0779308751, 0, 0.65909034, 0)
-Frame12.Size = UDim2.new(1.0038569, 0, 0.227272734, 0)
-Frame12.BackgroundColor = BrickColor.new("Institutional white")
-Frame12.BackgroundColor3 = Color3.new(1, 1, 1)
-Frame12.BackgroundTransparency = 0.75
-Frame12.BorderSizePixel = 0
-Frame13.Name = "Bar"
-Frame13.Parent = Frame12
-Frame13.Size = UDim2.new(0.524861872, 0, 1, 0)
-Frame13.BackgroundColor = BrickColor.new("Institutional white")
-Frame13.BackgroundColor3 = Color3.new(1, 1, 1)
-Frame13.BackgroundTransparency = 0.5
-Frame13.BorderSizePixel = 0
-UIAspectRatioConstraint14.Parent = Frame13
-UIAspectRatioConstraint14.AspectRatio = 9.160382270812988
-UIAspectRatioConstraint15.Parent = Frame12
-UIAspectRatioConstraint15.AspectRatio = 17.452938079833984
-UIAspectRatioConstraint16.Parent = Frame11
-UIAspectRatioConstraint16.AspectRatio = 3.9513373374938965
-UIAspectRatioConstraint17.Parent = Frame10
-UIAspectRatioConstraint17.AspectRatio = 2.767733335494995
-UIPadding18.Parent = Frame1
-UIPadding18.PaddingBottom = UDim.new(0, 4)
-UIPadding18.PaddingRight = UDim.new(0, 8)
-UIAspectRatioConstraint19.Parent = Frame1
-UIAspectRatioConstraint19.AspectRatio = 1.8835649490356445
+UIAspectRatioConstraint8.AspectRatio = 1.058823585510254
+TextLabel9.Name = "SpeedShadow"
+TextLabel9.Parent = Frame2
+TextLabel9.Position = UDim2.new(0.233325571, 0, -0.0424566902, 0)
+TextLabel9.Size = UDim2.new(0.607142866, 0, 1.2337662, 0)
+TextLabel9.BackgroundColor = BrickColor.new("Dark grey metallic")
+TextLabel9.BackgroundColor3 = Color3.new(0.329412, 0.329412, 0.329412)
+TextLabel9.BackgroundTransparency = 1
+TextLabel9.BorderColor3 = Color3.new(0.207843, 0.207843, 0.207843)
+TextLabel9.BorderSizePixel = 16
+TextLabel9.Font = Enum.Font.SourceSansLight
+TextLabel9.FontSize = Enum.FontSize.Size96
+TextLabel9.Text = "<i>000</i>"
+TextLabel9.TextColor = BrickColor.new("Really black")
+TextLabel9.TextColor3 = Color3.new(0, 0, 0)
+TextLabel9.TextScaled = true
+TextLabel9.TextSize = 100
+TextLabel9.TextStrokeColor3 = Color3.new(0.298039, 0.298039, 0.298039)
+TextLabel9.TextTransparency = 0.800000011920929
+TextLabel9.TextWrap = true
+TextLabel9.TextWrapped = true
+TextLabel9.RichText = true
+UIAspectRatioConstraint10.Parent = TextLabel9
+UIAspectRatioConstraint10.AspectRatio = 1.2526315450668335
+TextLabel11.Name = "GearShadow"
+TextLabel11.Parent = Frame2
+TextLabel11.Position = UDim2.new(0.045980338, 0, 0.611073673, 0)
+TextLabel11.Size = UDim2.new(0.183673471, 0, 0.44155845, 0)
+TextLabel11.BackgroundColor = BrickColor.new("Institutional white")
+TextLabel11.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel11.BackgroundTransparency = 1
+TextLabel11.BorderColor3 = Color3.new(0.207843, 0.207843, 0.207843)
+TextLabel11.BorderSizePixel = 16
+TextLabel11.Font = Enum.Font.GothamMedium
+TextLabel11.FontSize = Enum.FontSize.Size36
+TextLabel11.LineHeight = 0.8999999761581421
+TextLabel11.Text = "<i>1</i>"
+TextLabel11.TextColor = BrickColor.new("Really black")
+TextLabel11.TextColor3 = Color3.new(0, 0, 0)
+TextLabel11.TextScaled = true
+TextLabel11.TextSize = 35
+TextLabel11.TextStrokeColor3 = Color3.new(0.298039, 0.298039, 0.298039)
+TextLabel11.TextTransparency = 0.800000011920929
+TextLabel11.TextWrap = true
+TextLabel11.TextWrapped = true
+TextLabel11.RichText = true
+UIAspectRatioConstraint12.Parent = TextLabel11
+UIAspectRatioConstraint12.AspectRatio = 1.058823585510254
+TextLabel13.Name = "FormatFormat Shadow"
+TextLabel13.Parent = Frame2
+TextLabel13.Position = UDim2.new(0.779999971, 0, 0.709999979, 0)
+TextLabel13.Size = UDim2.new(0.183673471, 0, 0.324675292, 0)
+TextLabel13.BackgroundColor = BrickColor.new("Institutional white")
+TextLabel13.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel13.BackgroundTransparency = 1
+TextLabel13.BorderColor3 = Color3.new(0.207843, 0.207843, 0.207843)
+TextLabel13.BorderSizePixel = 16
+TextLabel13.Font = Enum.Font.Oswald
+TextLabel13.FontSize = Enum.FontSize.Size24
+TextLabel13.Text = "<i><b>MPH</b></i>"
+TextLabel13.TextColor = BrickColor.new("Really black")
+TextLabel13.TextColor3 = Color3.new(0, 0, 0)
+TextLabel13.TextScaled = true
+TextLabel13.TextSize = 19
+TextLabel13.TextStrokeColor3 = Color3.new(0.298039, 0.298039, 0.298039)
+TextLabel13.TextTransparency = 0.800000011920929
+TextLabel13.TextWrap = true
+TextLabel13.TextWrapped = true
+TextLabel13.RichText = true
+UIAspectRatioConstraint14.Parent = TextLabel13
+UIAspectRatioConstraint14.AspectRatio = 1.440000057220459
+UIAspectRatioConstraint15.Parent = Frame2
+UIAspectRatioConstraint15.AspectRatio = 2.545454502105713
+Frame16.Name = "Bottom"
+Frame16.Parent = Frame1
+Frame16.Position = UDim2.new(0.28125, 0, 0.5182482, 0)
+Frame16.Size = UDim2.new(0.612500012, 0, 0.416058391, 0)
+Frame16.BackgroundColor = BrickColor.new("Institutional white")
+Frame16.BackgroundColor3 = Color3.new(1, 1, 1)
+Frame16.BackgroundTransparency = 1
+Frame17.Name = "Meter"
+Frame17.Parent = Frame16
+Frame17.Position = UDim2.new(-0.0663265288, 0, 0.140350878, 0)
+Frame17.Size = UDim2.new(1.10204077, 0, 0.771929801, 0)
+Frame17.BackgroundColor = BrickColor.new("Institutional white")
+Frame17.BackgroundColor3 = Color3.new(1, 1, 1)
+Frame17.BackgroundTransparency = 1
+Frame18.Name = "BarBackground"
+Frame18.Parent = Frame17
+Frame18.Position = UDim2.new(0.0925925896, 0, 0.681818187, 0)
+Frame18.Size = UDim2.new(0.837962985, 0, 0.227272734, 0)
+Frame18.BackgroundColor = BrickColor.new("Institutional white")
+Frame18.BackgroundColor3 = Color3.new(1, 1, 1)
+Frame18.BackgroundTransparency = 0.75
+Frame18.BorderSizePixel = 0
+UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(1,1,1)), ColorSequenceKeypoint.new(0.6, Color3.new(1,1,1)),ColorSequenceKeypoint.new(0.85, Color3.new(1, 0, 0)),ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))})
+UIGradient.Enabled = true
+UIGradient.Parent = Frame18
+Frame19.Name = "Bar"
+Frame19.Parent = Frame18
+Frame19.Size = UDim2.new(1, 0, 1, 0)
+Frame19.BackgroundColor = BrickColor.new("Institutional white")
+Frame19.BackgroundColor3 = Color3.new(1, 1, 1)
+Frame19.BackgroundTransparency = 0.4000000059604645
+Frame19.BorderSizePixel = 0
+Frame19.ZIndex = 2
+UIAspectRatioConstraint20.Parent = Frame19
+UIAspectRatioConstraint20.AspectRatio = 9.5
+UIAspectRatioConstraint21.Parent = Frame18
+UIAspectRatioConstraint21.AspectRatio = 18.100000381469727
+Frame22.Name = "BarBackgroundShadow"
+Frame22.Parent = Frame17
+Frame22.Position = UDim2.new(0.109999999, 0, 0.75, 0)
+Frame22.Size = UDim2.new(0.837962985, 0, 0.227272734, 0)
+Frame22.BackgroundColor = BrickColor.new("Really black")
+Frame22.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame22.BackgroundTransparency = 0.949999988079071
+Frame22.BorderSizePixel = 0
+UIAspectRatioConstraint23.Parent = Frame22
+UIAspectRatioConstraint23.AspectRatio = 18.100000381469727
+UIAspectRatioConstraint24.Parent = Frame17
+UIAspectRatioConstraint24.AspectRatio = 4.909090995788574
+UIAspectRatioConstraint25.Parent = Frame16
+UIAspectRatioConstraint25.AspectRatio = 3.438596487045288
+UIAspectRatioConstraint26.Parent = Frame1
+UIAspectRatioConstraint26.AspectRatio = 2.335766315460205
+UIPadding27.Parent = Frame1
 for i,v in pairs(mas:GetChildren()) do
 	v.Parent = assetFolder
 	pcall(function() v:MakeJoints() end)
@@ -168,6 +267,7 @@ for i,v in pairs(cors) do
 		pcall(v)
 	end)
 end
+
 
 --Surface GUI
 cors = {}
@@ -455,57 +555,41 @@ local function modernspeedometer()
             if not game.Players.LocalPlayer.PlayerGui:FindFirstChild("ScreenGui") then
                 ScreenGUI = assetFolder.ScreenGui:Clone()
                 ScreenGUI.Parent = game.Players.LocalPlayer.PlayerGui
-                for i, v in pairs(ScreenGUI:GetDescendants()) do
-                    if v:IsA("TextLabel") then
-                        v.TextTransparency = 1
-                        tweenService:Create(v,tweenInfo,{TextTransparency = 0.5}):Play()
-                    elseif v:IsA("Frame") then
-                        if v.Name == "BarBackground" then
-                            v.Transparency = 1
-                            tweenService:Create(v,tweenInfo,{Transparency = 0.75}):Play()
-                        elseif v.Name == "BarBackground" then
-                            v.Transparency = 1
-                            tweenService:Create(v,tweenInfo,{Transparency = 0.5}):Play()
-                        end
-                    end
-                end
             end
             game.Players.LocalPlayer.PlayerGui.AppUI.Enabled = false
             game.Players.LocalPlayer.PlayerGui.HotbarGui.Enabled = false
             game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.UIAspectRatioConstraint:Destroy()
             task.wait(0.1)
             while OnVehicle do
-                local gear = calGear()
-                task.wait(1/60)
-                task.spawn(function()
-                    game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Gear.Text = "<i>"..gear.."</i>"
-                    game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Speed.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
-                    calRPM()
-                    if vehicleRPM > 1800 then
-                        if vehicleRPM < 1901 then
-                            local saturation = 1900-vehicleRPM
-                            local satCal = 1 - saturation/100
-                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.BackgroundColor3 = Color3.fromHSV(0.0, satCal, 1)
-                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.Size = UDim2.new(1, 0, 1, 0)
-                        end
-                    elseif vehicleRPM < 1801 then
-                        game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.BackgroundColor3 = Color3.fromHSV(0, 0.0, 1)
-                        game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.Size = UDim2.new(vehicleRPM/1800, 0, 1, 0)
-                    end
+                pcall(function()
+                    local gear = calGear()
+                    task.wait(1/60)
+                    task.spawn(function()
+                        pcall(function()
+                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Gear.Text = "<i>"..gear.."</i>"
+                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.GearShadow.Text = "<i>"..gear.."</i>"
+                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.Speed.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
+                            game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Top.SpeedShadow.Text = "<i>"..game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text.."</i>"
+                            calRPM()
+                            if vehicleRPM > 1800 then
+                                if vehicleRPM < 1901 then
+                                    local saturation = 1900-vehicleRPM
+                                    local satCal = 1 - saturation/100
+                                    game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.BackgroundColor3 = Color3.fromHSV(0.0, satCal, 0.561)
+                                    game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.Size = UDim2.new(1, 0, 1, 0)
+                                end
+                            elseif vehicleRPM < 1801 then
+                                game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.BackgroundColor3 = Color3.fromHSV(0, 0.0, 1)
+                                game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.Size = UDim2.new(vehicleRPM/1800, 0, 1, 0)
+                            end
+                        end)
+                    end)
                 end)
             end
         else
             game.Players.LocalPlayer.PlayerGui.AppUI.Enabled = true
             game.Players.LocalPlayer.PlayerGui.HotbarGui.Enabled = true
             if game.Players.LocalPlayer.PlayerGui.ScreenGui then
-                for i, v in pairs(game.Players.LocalPlayer.PlayerGui.ScreenGui:GetDescendants()) do
-                    if v:IsA("TextLabel") then
-                        tweenService:Create(v,tweenInfo,{TextTransparency = 1}):Play()
-                    elseif v:IsA("Frame") then
-                        tweenService:Create(v,tweenInfo,{Transparency = 1}):Play()
-                    end
-                end
-                task.wait(2)
                 game.Players.LocalPlayer.PlayerGui.ScreenGui:Destroy()
             end
         end
