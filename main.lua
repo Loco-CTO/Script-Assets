@@ -417,14 +417,15 @@ end
 local OnVehicle = false
 local modern3dspeedometerEnable = false
 local modernspeedometerEnable = false
+local speedTest = false
+local vehicleLock = false
 local playerVehicle = nil
 local SurfaceGUI
 local ScreenGUI
 local vehicleRPM
 local vehicleForward
-local speedTest = false
+local speedtestfilename = ""
 local speedTestSheet = ""
-local vehicleLock = false
 
 --Value
 
@@ -616,7 +617,137 @@ local function modernspeedometer()
     end
 end
 
-local function startspeedTest()
+local function recordspeedTest()
+    getPlayerVehicle()
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "You are entering speedtest mode, do not press any key until you are being told!",
+        Duration = 5,
+        Callback = function() end
+    }
+    GUI:set_status("Status | Speed Test Mode")
+    task.wait(1)
+    local platform = Instance.new("Part")
+    platform.Position = game.Workspace.Loco_CTO.HumanoidRootPart.Position + Vector3.new(0 ,0 ,0)
+    platform.CanCollide = true
+    platform.Anchored = true
+    platform.Parent = speedTestFolder
+    platform.Size = Vector3.new(50,8,50)
+    platform.Material = Enum.Material.ForceField
+    platform.Color = Color3.new(1, 0, 0)
+    playerVehicle:SetPrimaryPartCFrame(platform.CFrame)
+    
+    local repos = Instance.new("Part")
+    repos.Position = game.Workspace.Loco_CTO.HumanoidRootPart.Position + Vector3.new(0 ,10 ,0)
+    repos.CanCollide = false
+    repos.Anchored = true
+    repos.Parent = speedTestFolder
+    repos.Transparency = 1
+    playerVehicle:SetPrimaryPartCFrame(repos.CFrame)
+    task.wait(1)
+    playerVehicle:SetPrimaryPartCFrame(repos.CFrame)
+    task.wait(1)
+    repos:Destroy()
+
+    local pos = Instance.new("Part")
+    pos.CFrame = playerVehicle.Engine.CFrame
+    pos.Anchored = true
+    pos.Parent = speedTestFolder
+    pos.CanCollide = false
+    pos.Transparency = 1
+    task.wait(2)
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "Speed test is going to start, get prepared",
+        Duration = 3,
+        Callback = function() end
+    }
+    task.wait(3)
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "3",
+        Duration = 1,
+        Callback = function() end
+    }
+    task.wait(1)
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "2",
+        Duration = 1,
+        Callback = function() end
+    }
+    task.wait(1)
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "1",
+        Duration = 1,
+        Callback = function() end
+    }
+    task.wait(1)
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "Start",
+        Duration = 1,
+        Callback = function() end
+    }
+    task.wait(1)
+    speedTest = true
+    vehicleLock = true
+    local tweenInfo = TweenInfo.new(1)
+    tweenService:Create(platform,tweenInfo,{Color = Color3.new(0, 1, 0)}):Play()
+    task.wait(0.1)
+    task.spawn(function()
+        while vehicleLock do
+            playerVehicle:SetPrimaryPartCFrame(pos.CFrame)
+            task.wait(1/120)
+        end
+    end)
+    task.spawn(function()
+        local recording = {}
+        local sec = 0
+        local properties = {}
+        properties["Vehicle Name"] = playerVehicle.Name
+        
+        recording[sec + 1] = properties
+        while speedTest do
+            keypress(0x57)
+            local properties = {}
+            properties["Time"] = sec
+            properties["Speed"] = game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text
+    
+            recording[sec + 2] = properties
+            sec += 1
+            task.wait(1)
+        end
+        speedTestSheet = HttpService:JSONEncode(recording)
+    end)
+    task.wait(61)
+    task.spawn(function()
+        keyrelease(0x57)
+    end)
+    speedTest = false
+    tweenService:Create(platform,tweenInfo,{Color = Color3.new(1, 0, 0)}):Play()
+    task.wait(1)
+    repeat task.wait(1) until tostring(game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text) == "000"
+    vehicleLock = false
+    for i, part in pairs(speedTestFolder:GetDescendants()) do
+        part:Destroy()
+    end
+    if speedtestfilename ~= nil and speedtestfilename ~= "" then
+        writefile(tostring("JailbreakVision/SpeedTestResults/"..speedtestfilename..".json"), tostring(speedTestSheet))
+    else
+        writefile("JailbreakVision/SpeedTestResults/Untitled.json", tostring(speedTestSheet))
+    end
+    GUI:Notification{
+        Title = "Speed Test",
+        Text = "You are no longer in speedtest mode, feel free to continue your journey.",
+        Duration = 5,
+        Callback = function() end
+    }
+    GUI:set_status("Status | Idle")
+end
+
+local function debugspeedTest()
     GUI:Prompt{
         Followup = false,
         Title = "Speed Test",
@@ -625,125 +756,49 @@ local function startspeedTest()
             Yes = function()
                 if OnVehicle then
                     if tostring(game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text) == "000" then
-                        getPlayerVehicle()
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "You are entering speedtest mode, do not press any key until you are being told!",
-                            Duration = 5,
-                            Callback = function() end
-                        }
-                        GUI:set_status("Status | Speed Test Mode")
-                        task.wait(1)
-                        local platform = Instance.new("Part")
-                        platform.Position = game.Workspace.Loco_CTO.HumanoidRootPart.Position + Vector3.new(0 ,0 ,0)
-                        platform.CanCollide = true
-                        platform.Anchored = true
-                        platform.Parent = speedTestFolder
-                        platform.Size = Vector3.new(50,8,50)
-                        platform.Material = Enum.Material.ForceField
-                        platform.Color = Color3.new(1, 0, 0)
-                        playerVehicle:SetPrimaryPartCFrame(platform.CFrame)
-                        
-                        local repos = Instance.new("Part")
-                        repos.Position = game.Workspace.Loco_CTO.HumanoidRootPart.Position + Vector3.new(0 ,10 ,0)
-                        repos.CanCollide = false
-                        repos.Anchored = true
-                        repos.Parent = speedTestFolder
-                        repos.Transparency = 1
-                        playerVehicle:SetPrimaryPartCFrame(repos.CFrame)
-                        task.wait(1)
-                        playerVehicle:SetPrimaryPartCFrame(repos.CFrame)
-                        task.wait(1)
-                        repos:Destroy()
-    
-                        local pos = Instance.new("Part")
-                        pos.CFrame = playerVehicle.Engine.CFrame
-                        pos.Anchored = true
-                        pos.Parent = speedTestFolder
-                        pos.CanCollide = false
-                        pos.Transparency = 1
-                        task.wait(2)
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "Speed test is going to start, get prepared",
-                            Duration = 3,
-                            Callback = function() end
-                        }
-                        task.wait(3)
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "3",
-                            Duration = 1,
-                            Callback = function() end
-                        }
-                        task.wait(1)
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "2",
-                            Duration = 1,
-                            Callback = function() end
-                        }
-                        task.wait(1)
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "1",
-                            Duration = 1,
-                            Callback = function() end
-                        }
-                        task.wait(1)
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "Start",
-                            Duration = 1,
-                            Callback = function() end
-                        }
-                        task.wait(1)
-                        speedTest = true
-                        vehicleLock = true
-                        local tweenInfo = TweenInfo.new(1)
-                        tweenService:Create(platform,tweenInfo,{Color = Color3.new(0, 1, 0)}):Play()
-                        task.wait(0.1)
-                        task.spawn(function()
-                            while vehicleLock do
-                                playerVehicle:SetPrimaryPartCFrame(pos.CFrame)
-                                task.wait(1/120)
+                        if speedtestfilename ~= nil and speedtestfilename ~= "" then
+                            if isfile(tostring("JailbreakVision/SpeedTestResults/"..speedtestfilename..".json")) then
+                                print("Custom file name exist")
+                                GUI:Prompt{
+                                    Followup = true,
+                                    Title = "Speed Test",
+                                    Text = "File "..speedtestfilename..".json already exist, do you want to replace it?",
+                                    Buttons = {
+                                        Yes = function()
+                                            recordspeedTest()
+                                            return
+                                        end,
+                                        No = function()
+                                            return
+                                        end
+                                    }
+                                }
+                            else
+                                print("Custom file name doesnt exist")
+                                recordspeedTest()
                             end
-                        end)
-                        task.spawn(function()
-                            local recording = {}
-                            local sec = 0
-                            while speedTest do
-                                keypress(0x57)
-                                local properties = {}
-                                properties["Time"] = sec
-                                properties["Speed"] = game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text
-                        
-                                recording[sec + 1] = properties
-                                sec += 1
-                                task.wait(1)
+                        else
+                            if isfile("JailbreakVision/SpeedTestResults/Untitled.json") then
+                                print("Auto file name exist")
+                                GUI:Prompt{
+                                    Followup = true,
+                                    Title = "Speed Test",
+                                    Text = "File Untitled.json already exist, do you want to replace it?",
+                                    Buttons = {
+                                        Yes = function()
+                                            recordspeedTest()
+                                            return
+                                        end,
+                                        No = function()
+                                            return
+                                        end
+                                    }
+                                }
+                            else
+                                print("Auto file name doesnt exist")
+                                recordspeedTest()
                             end
-                            speedTestSheet = HttpService:JSONEncode(recording)
-                        end)
-                        task.wait(61)
-                        task.spawn(function()
-                            keyrelease(0x57)
-                        end)
-                        speedTest = false
-                        tweenService:Create(platform,tweenInfo,{Color = Color3.new(1, 0, 0)}):Play()
-                        task.wait(1)
-                        repeat task.wait(1) until tostring(game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text) == "000"
-                        vehicleLock = false
-                        for i, part in pairs(speedTestFolder:GetDescendants()) do
-                            part:Destroy()
                         end
-                        writefile("JailbreakVision/SpeedTestResults/LatestTest.json", tostring(speedTestSheet))
-                        GUI:Notification{
-                            Title = "Speed Test",
-                            Text = "You are no longer in speedtest mode, feel free to continue your journey.",
-                            Duration = 5,
-                            Callback = function() end
-                        }
-                        GUI:set_status("Status | Idle")
                     else
                         GUI:Notification{
                             Title = "Speed Test",
@@ -830,11 +885,18 @@ local vehicleTab = GUI:tab{
     Name = "Vehicle Utilities"
 }
 
+vehicleTab:Textbox{
+	Name = "Filename",
+	Callback = function(text)
+        speedtestfilename = text
+    end
+}
+
 vehicleTab:Button{
 	Name = "Start Speed Test",
 	Description = nil,
 	Callback = function()
-        startspeedTest()
+        debugspeedTest()
     end
 }
 
