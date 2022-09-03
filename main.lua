@@ -579,7 +579,7 @@ local function modernspeedometer()
             end
             game.Players.LocalPlayer.PlayerGui.AppUI.Enabled = false
             game.Players.LocalPlayer.PlayerGui.HotbarGui.Enabled = false
-            game.Players.LocalPlayer.PlayerGui.levelgui2.Enabled = false
+            game.Players.LocalPlayer.PlayerGui.LevelGui2.Enabled = false
             game.Players.LocalPlayer.PlayerGui.ScreenGui.Speedometer.Bottom.Meter.BarBackground.Bar.UIAspectRatioConstraint:Destroy()
             task.wait(0.1)
             while OnVehicle do
@@ -611,7 +611,7 @@ local function modernspeedometer()
         else
             game.Players.LocalPlayer.PlayerGui.AppUI.Enabled = true
             game.Players.LocalPlayer.PlayerGui.HotbarGui.Enabled = true
-            game.Players.LocalPlayer.PlayerGui.levelgui2.Enabled = true
+            game.Players.LocalPlayer.PlayerGui.LevelGui2.Enabled = true
             if game.Players.LocalPlayer.PlayerGui.ScreenGui then
                 game.Players.LocalPlayer.PlayerGui.ScreenGui:Destroy()
             end
