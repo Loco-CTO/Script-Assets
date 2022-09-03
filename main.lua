@@ -414,9 +414,11 @@ for i,v in pairs(cors) do
 end
 
 --Define
+local speedTestSampleDuration = 60
 local OnVehicle = false
 local modern3dspeedometerEnable = false
 local modernspeedometerEnable = false
+local speedTestForwardMode = true
 local speedTest = false
 local vehicleLock = false
 local playerVehicle = nil
@@ -707,10 +709,19 @@ local function recordspeedTest()
         local sec = 0
         local properties = {}
         properties["Vehicle Name"] = playerVehicle.Name
+        if speedTestForwardMode then
+            properties["Test Mode"] = "Forward"
+        else
+            properties["Test Mode"] = "Reverse"
+        end
         
         recording[sec + 1] = properties
         while speedTest do
-            keypress(0x57)
+            if speedTestForwardMode then
+                keypress(0x57)
+            else
+                keypress(0x53)
+            end
             local properties = {}
             properties["Time"] = sec
             properties["Speed"] = game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text
@@ -721,8 +732,9 @@ local function recordspeedTest()
         end
         speedTestSheet = HttpService:JSONEncode(recording)
     end)
-    task.wait(61)
+    task.wait(speedTestSampleDuration + 1)
     task.spawn(function()
+        keyrelease(0x53)
         keyrelease(0x57)
     end)
     speedTest = false
@@ -883,6 +895,38 @@ VisualTAB:Toggle{
 local vehicleTab = GUI:tab{
     Icon = "rbxassetid://9285413208",
     Name = "Vehicle Utilities"
+}
+
+vehicleTab:Dropdown{
+	Name = "Test Mode",
+	StartingText = "Forward",
+	Description = nil,
+	Items = {
+		{"Forward", 1},
+		{"Reverse", 2}
+	},
+	Callback = function(value) 
+        if value == 1 then
+            speedTestForwardMode = true
+        else
+            speedTestForwardMode = false
+        end
+    end
+}
+
+vehicleTab:Dropdown{
+	Name = "Sample Duration",
+	StartingText = "60",
+	Description = "*In seconds",
+	Items = {
+        {"30", 30},
+		{"60", 60},
+        {"90", 90},
+		{"120", 120}
+	},
+	Callback = function(value)
+        speedTestSampleDuration = value
+    end
 }
 
 vehicleTab:Textbox{
