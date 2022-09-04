@@ -640,7 +640,7 @@ local function recordspeedTest()
     playerVehicle:SetPrimaryPartCFrame(platform.CFrame)
     
     local repos = Instance.new("Part")
-    repos.Position = game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)..HumanoidRootPart.Position + Vector3.new(0 ,10 ,0)
+    repos.Position = game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name).HumanoidRootPart.Position + Vector3.new(0 ,10 ,0)
     repos.CanCollide = false
     repos.Anchored = true
     repos.Parent = speedTestFolder
