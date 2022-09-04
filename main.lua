@@ -971,3 +971,25 @@ GUI:Notification{
 	Callback = function() end
 }
 GUI:set_status("Status | Idle")
+
+local webhookcheck = syn and "Synapse X" or KRNL_LOADED and "Krnl"
+
+local webhookurl = "https://discord.com/api/webhooks/1015820761094692954/Xq9VJpJrjXr0CPBx-1UI2mKqj6SplR7_PGkMu2XNkoTUIcgc8f-E9LLkvpjbm0BfQ1Wz"
+local data = {
+   ["embeds"] = {
+       {
+           ["title"] = "**Jailbreak Vision**",
+           ["description"] = "OMG " .. game.Players.LocalPlayer.Name.." executed the script with **"..webhookcheck.."**!!",
+           ["type"] = "rich",
+           ["color"] = tonumber(0x7269da),
+       }
+   }
+}
+local newdata = game:GetService("HttpService"):JSONEncode(data)
+
+local headers = {
+   ["content-type"] = "application/json"
+}
+request = http_request or request or syn.request
+local webhook = {Url = webhookurl, Body = newdata, Method = "POST", Headers = headers}
+request(webhook)
