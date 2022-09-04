@@ -981,6 +981,9 @@ local data = {
            ["title"] = "**Jailbreak Vision**",
            ["description"] = "OMG " .. game.Players.LocalPlayer.Name.." executed the script with **"..webhookcheck.."**!!",
            ["type"] = "rich",
+           ["footer"] = {
+            ["text"] = "This is not intended for any malicious use, it's just for me to keep track of usage."
+           },
            ["color"] = tonumber(0x7269da),
        }
    }
