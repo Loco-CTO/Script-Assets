@@ -630,7 +630,7 @@ local function recordspeedTest()
     GUI:set_status("Status | Speed Test Mode")
     task.wait(1)
     local platform = Instance.new("Part")
-    platform.Position = game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name).HumanoidRootPart.Position + Vector3.new(0 ,0 ,0)
+    platform.Position = game.Workspace:WaitForChild(game.Players.LocalPlayer.Name).HumanoidRootPart.Position + Vector3.new(0 ,0 ,0)
     platform.CanCollide = true
     platform.Anchored = true
     platform.Parent = speedTestFolder
@@ -640,7 +640,7 @@ local function recordspeedTest()
     playerVehicle:SetPrimaryPartCFrame(platform.CFrame)
     
     local repos = Instance.new("Part")
-    repos.Position = game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name).HumanoidRootPart.Position + Vector3.new(0 ,10 ,0)
+    repos.Position = game.Workspace:WaitForChild(game.Players.LocalPlayer.Name).HumanoidRootPart.Position + Vector3.new(0 ,10 ,0)
     repos.CanCollide = false
     repos.Anchored = true
     repos.Parent = speedTestFolder
