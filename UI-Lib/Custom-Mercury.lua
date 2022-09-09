@@ -1639,6 +1639,7 @@ function Library:dropdown(options)
 					v:Destroy()
 				end
 			end
+			return true
 		end)
 		if open then toggle() end
 	end
