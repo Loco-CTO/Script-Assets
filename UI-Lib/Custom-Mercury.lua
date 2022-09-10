@@ -64,16 +64,21 @@ local Library = {
 			WeakText = Color3.fromHSV(0, 0, 172/255)
 		},
 		Aqua = {
-			Main = Color3.fromRGB(19, 21, 21),
+			Main = Color3.fromRGB(29, 28, 37),
 			Secondary = Color3.fromRGB(65, 63, 63),
 			Tertiary = Color3.fromRGB(51, 153, 137),
 
 			StrongText = Color3.fromHSV(0, 0, 1),        
 			WeakText = Color3.fromHSV(0, 0, 172/255)
 		},
-		Vaporwave = {},
-		OperaGX = {},
-		VisualStudio = {}
+		Custom = {
+			Main = Color3.fromRGB(29, 18, 39),
+			Secondary = Color3.fromRGB(54, 35, 71),
+			Tertiary = Color3.fromRGB(85, 55, 112),
+
+			StrongText = Color3.fromHSV(0, 0, 1),        
+			WeakText = Color3.fromHSV(0, 0, 172/255)
+		},
 	},
 	ColorPickerStyles = {
 		Legacy = 0,
