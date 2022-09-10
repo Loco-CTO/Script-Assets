@@ -24,6 +24,9 @@ speedTestFolder.Parent = assetFolder
 
 makefolder("JailbreakVision")
 makefolder("JailbreakVision/SpeedTestResults")
+makefolder("JailbreakVision/ModelsImporter")
+makefolder("JailbreakVision/MapEditor")
+makefolder("JailbreakVision/GameExport")
 
 --Preload Assets
 --Screen GUI
@@ -421,6 +424,7 @@ local modernspeedometerEnable = false
 local speedTestForwardMode = true
 local speedTest = false
 local vehicleLock = false
+local clicktoDel = false
 local playerVehicle = nil
 local SurfaceGUI
 local ScreenGUI
@@ -428,6 +432,9 @@ local vehicleRPM
 local vehicleForward
 local speedtestfilename = ""
 local speedTestSheet = ""
+local mapExportMap = "Untitled"
+local mapImportMap = "Nil"
+local MapExportMode = 1
 
 --Value
 
@@ -770,7 +777,6 @@ local function debugspeedTest()
                     if tostring(game.Players.LocalPlayer.PlayerGui.AppUI.Speedometer.Top.Speed.Text) == "000" then
                         if speedtestfilename ~= nil and speedtestfilename ~= "" then
                             if isfile(tostring("JailbreakVision/SpeedTestResults/"..speedtestfilename..".json")) then
-                                print("Custom file name exist")
                                 GUI:Prompt{
                                     Followup = true,
                                     Title = "Speed Test",
@@ -786,12 +792,10 @@ local function debugspeedTest()
                                     }
                                 }
                             else
-                                print("Custom file name doesnt exist")
                                 recordspeedTest()
                             end
                         else
                             if isfile("JailbreakVision/SpeedTestResults/Untitled.json") then
-                                print("Auto file name exist")
                                 GUI:Prompt{
                                     Followup = true,
                                     Title = "Speed Test",
@@ -807,7 +811,6 @@ local function debugspeedTest()
                                     }
                                 }
                             else
-                                print("Auto file name doesnt exist")
                                 recordspeedTest()
                             end
                         end
@@ -835,26 +838,167 @@ local function debugspeedTest()
     }
 end
 
---Handler
-game.Players.LocalPlayer.PlayerGui.AppUI.ChildAdded:Connect(function(gui)
-    if gui.name == "Speedometer" then
-        OnVehicle = true
-        getPlayerVehicle()
-        task.wait(0.1)
-        modern3dspeedometer()
-        modernspeedometer()
+local function exportMap()
+    if MapExportMode == 1 then
+        makefolder("JailbreakVision/MapEditor/"..mapExportMap)
+        local terrainRegion  = workspace.Terrain:CopyRegion(workspace.Terrain.MaxExtents)
+        saveinstance(terrainRegion , "JailbreakVision/MapEditor/"..mapExportMap.."/Terrain")
+        GUI:Notification{
+            Title = "Map Editor",
+            Text = "Terrain exported!",
+            Duration = 5,
+            Callback = function() end
+        }
+        if game.Workspace:FindFirstChild("MapExporterModels") then
+            saveinstance(game.Workspace.MapExporterModels , "JailbreakVision/MapEditor/"..mapExportMap.."/Models")
+            GUI:Notification{
+                Title = "Map Editor",
+                Text = "Model exported!",
+                Duration = 5,
+                Callback = function() end
+            }
+        else
+            GUI:Notification{
+                Title = "Map Editor",
+                Text = "Model export failed, model not found.",
+                Duration = 5,
+                Callback = function() end
+            }
+        end
+    elseif MapExportMode == 2 then
+        if game.Workspace:FindFirstChild("MapExporterModels") then
+            makefolder("JailbreakVision/MapEditor/"..mapExportMap)
+            saveinstance(game.Workspace.MapExporterModels , "JailbreakVision/MapEditor/"..mapExportMap.."/Models")
+            GUI:Notification{
+                Title = "Map Editor",
+                Text = "Model exported!",
+                Duration = 5,
+                Callback = function() end
+            }
+        else
+            GUI:Notification{
+                Title = "Map Editor",
+                Text = "Model export failed, model not found.",
+                Duration = 5,
+                Callback = function() end
+            }
+        end
+    else
+        makefolder("JailbreakVision/MapEditor/"..mapExportMap)
+        local terrainRegion  = workspace.Terrain:CopyRegion(workspace.Terrain.MaxExtents)
+        saveinstance(terrainRegion , "JailbreakVision/MapEditor/"..mapExportMap.."/Terrain")
+        GUI:Notification{
+            Title = "Map Editor",
+            Text = "Terrain exported!",
+            Duration = 5,
+            Callback = function() end
+        }
     end
-end)
+end
 
-game.Players.LocalPlayer.PlayerGui.AppUI.ChildRemoved:Connect(function(gui)
-    if gui.name == "Speedometer" then
-        OnVehicle = false
-        getPlayerVehicle()
-        task.wait(0.1)
-        modern3dspeedometer()
-        modernspeedometer()
+local function debugexportMap()
+    if game.Workspace:FindFirstChild("Terrain") then
+        if isfolder("JailbreakVision/MapEditor/"..mapExportMap) then
+            GUI:Prompt{
+                Followup = false,
+                Title = "Map Editor",
+                Text = "Map "..mapExportMap.." already exist, do you want to replace it?",
+                Buttons = {
+                    Yes = function()
+                        exportMap()
+                        return
+                    end,
+                    No = function()
+                        return
+                    end
+                }
+            }
+        else
+            exportMap()
+        end
     end
-end)
+end
+
+local function importMap()
+    local mapName = string.gsub(mapImportMap, "JailbreakVision/MapEditor\\", "")
+    if isfile("JailbreakVision/MapEditor/"..mapName.."/Terrain.rbxm") then
+        local terrain = game:GetObjects(getcustomasset("JailbreakVision/MapEditor/"..mapName.."/Terrain.rbxm"))[1]
+        game.Workspace.Terrain:Clear()
+        game.Workspace.Terrain:PasteRegion(terrain, workspace.Terrain.MaxExtents.Min, true)
+    end
+    if isfile("JailbreakVision/MapEditor/"..mapName.."/Models.rbxm") then
+        if game.Workspace:FindFirstChild("ImportedModel") then
+            game.Workspace:FindFirstChild("ImportedModel"):Destroy()
+        end
+        local model = game:GetObjects(getcustomasset("JailbreakVision/MapEditor/"..mapName.."/Models.rbxm"))[1]
+        model.Parent = game.Workspace
+        model.Name = "ImportedModel"
+        for i, v in pairs(model:GetDescendants()) do
+            if v:IsA("Part") then
+                if v.Material == Enum.Material.Asphalt and v.Color == Color3.fromRGB(91, 100, 112) then
+                    v.MaterialVariant = "BrightAsphalt"
+                elseif v.Material == Enum.Material.Sand and v.Color == Color3.fromRGB(243, 194, 157) then
+                    v.MaterialVariant = "SandFixed"
+                end
+            end
+        end
+    end
+    GUI:Notification{
+        Title = "Map Editor",
+        Text = "Map "..mapName.." has been imported!",
+        Duration = 10,
+        Callback = function() end
+    }
+end
+
+local function debugimportMap()
+    if isfolder(mapImportMap) then
+        GUI:Prompt{
+            Followup = false,
+            Title = "Map Editor",
+            Text = "Are you sure you want to import map "..mapImportMap.."? This will cleared all existing terrain!",
+            Buttons = {
+                Yes = function()
+                    importMap()
+                    return
+                end,
+                No = function()
+                    return
+                end
+            }
+        }
+    else
+        GUI:Notification{
+            Title = "Map Editor",
+            Text = "Map "..mapImportMap.." doesn't Exist.",
+            Duration = 5,
+            Callback = function() end
+        }
+    end
+end
+
+--Handler
+if game.PlaceId == 606849621 then
+    game.Players.LocalPlayer.PlayerGui.AppUI.ChildAdded:Connect(function(gui)
+        if gui.name == "Speedometer" then
+            OnVehicle = true
+            getPlayerVehicle()
+            task.wait(0.1)
+            modern3dspeedometer()
+            modernspeedometer()
+        end
+    end)
+    
+    game.Players.LocalPlayer.PlayerGui.AppUI.ChildRemoved:Connect(function(gui)
+        if gui.name == "Speedometer" then
+            OnVehicle = false
+            getPlayerVehicle()
+            task.wait(0.1)
+            modern3dspeedometer()
+            modernspeedometer()
+        end
+    end)
+end
 
 local function keyHandler(key)
     if key =='w' then
@@ -865,6 +1009,19 @@ local function keyHandler(key)
 end
 
 mouse.KeyDown:Connect(keyHandler)
+mouse.Button1Down:connect(function()
+    if not mouse.Target then 
+        return
+    else
+        if clicktoDel == true then
+            mouse.Target:Destroy()
+        else
+            return
+        end
+    end
+    
+end)
+    
 
 --GUI
 local VisualTAB = GUI:tab{
@@ -889,6 +1046,20 @@ VisualTAB:Toggle{
 	Callback = function(state)
         modernspeedometerEnable = state
         modernspeedometer()
+    end
+}
+
+local modelsTab = GUI:tab{
+    Icon = "rbxassetid://7072719866",
+    Name = "Models"
+}
+
+modelsTab:Toggle{
+	Name = "Click to delete",
+	StartingState = false,
+	Description = "Creates a 2D modern speedometer (UI Design by BruhOOFBoi)",
+	Callback = function(state)
+        clicktoDel = state
     end
 }
 
@@ -944,6 +1115,111 @@ vehicleTab:Button{
     end
 }
 
+local terrainTab = GUI:tab{
+    Icon = "rbxassetid://7072717348",
+    Name = "Map Edtior"
+}
+
+local terrainTabExportLabel = terrainTab:Label{
+    Text = "Editor",
+    Description = "Export"
+}
+
+terrainTab:Textbox{
+	Name = "Filename",
+	Callback = function(text)
+        mapExportMap = text
+    end
+}
+
+terrainTab:Dropdown{
+	Name = "Export Mode",
+	StartingText = "Both",
+	Description = nil,
+	Items = {
+        {"Both", 1},
+		{"Model Only", 2},
+        {"Terrain Only", 3}
+	},
+	Callback = function(value)
+        MapExportMode = value
+    end
+}
+
+terrainTab:Button{
+	Name = "Export",
+	Description = nil,
+	Callback = function()
+        debugexportMap()
+    end
+}
+
+local terrainTabImportLabel = terrainTab:Label{
+    Text = "Edtior",
+    Description = "Import"
+}
+
+local importmapDropDown = terrainTab:Dropdown{
+	Name = "Import Selection",
+	StartingText = "Nil",
+	Description = "",
+	Items = listfiles("JailbreakVision/MapEditor"),
+	Callback = function(value)
+        mapImportMap = value
+    end
+}
+
+terrainTab:Button{
+	Name = "Import",
+	Description = nil,
+	Callback = function()
+        debugimportMap()
+    end
+}
+
+terrainTab:Button{
+	Name = "Refresh",
+	Description = nil,
+	Callback = function()
+        importmapDropDown:Clear()
+        task.wait(0.5)
+        for i, v in pairs(listfiles("JailbreakVision/MapEditor")) do
+            importmapDropDown:AddItems({
+                v
+            })
+            print("Added item"..v)
+        end
+    end
+}
+
+local gameExport = GUI:tab{
+    Icon = "rbxassetid://7072721454",
+    Name = "Game Export"
+}
+
+gameExport:Button{
+	Name = "Export Game",
+	Description = "Saves the game into a rbxl file.",
+	Callback = function()
+        GUI:Prompt{
+            Followup = false,
+            Title = "Game Exporter",
+            Text = "Are you sure you want to export this game?",
+            Buttons = {
+                Yes = function()
+                    local GetName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+
+                    saveinstance(game, "JailbreakVision/GameExport/"..GetName.Name)
+                    return
+                end,
+                No = function()
+                    return
+                end
+            }
+        }
+    end
+}
+
 GUI:Credit{
 	Name = "Loco_CTO",
 	Description = "Main scripter",
@@ -970,6 +1246,7 @@ GUI:Notification{
 	Duration = 8,
 	Callback = function() end
 }
+
 GUI:set_status("Status | Idle")
 
 local webhookcheck = syn and "Synapse X" or KRNL_LOADED and "Krnl"
