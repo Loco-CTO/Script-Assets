@@ -84,7 +84,7 @@ function Library:Create(options)
 	--BaseFrame
 	do
 		-- StarterGui.VisionLib
-		GUI["1"] = Instance.new("ScreenGui", RunService:IsStudio() and Player.PlayerGui) or game:GetService("CoreGui")
+		GUI["1"] = Instance.new("ScreenGui", game.CoreGui)
 		GUI["1"]["Name"] = [[VisionLib]]
 		GUI["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
 	end
