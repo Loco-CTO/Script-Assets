@@ -104,18 +104,8 @@ function Library:Create(options)
 		GUI["3"] = Instance.new("UICorner", GUI["2"])
 		GUI["3"]["CornerRadius"] = UDim.new(0, 6)
 		
-		-- StarterGui.VisionLib.ShadowFrame
-		GUI["s1"] = Instance.new("Frame", GUI["1"])
-		GUI["s1"]["BackgroundColor3"] = Color3.fromRGB(41, 41, 41)
-		GUI["s1"]["Size"] = UDim2.new(0, 431, 0, 506)
-		GUI["s1"]["ClipsDescendants"] = false
-		GUI["s1"]["Position"] = UDim2.new(0.3449864089488983, 0, 0.09605705738067627, 0)
-		GUI["s1"]["Name"] = [[ShadowFrame]]
-		GUI["s1"]["BackgroundTransparency"] = 1
-		GUI["s1"]["ZIndex"] = 0
-		
 		-- StarterGui.VisionLib.MainFrame.DropShadowHolder
-		GUI["34"] = Instance.new("Frame", GUI["s1"])
+		GUI["34"] = Instance.new("Frame", GUI["2"])
 		GUI["34"]["ZIndex"] = 1
 		GUI["34"]["BorderSizePixel"] = 0
 		GUI["34"]["BackgroundTransparency"] = 1
