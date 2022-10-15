@@ -874,3 +874,5 @@ function Library:Create(options)
 	
 	return GUI
 end
+
+return Library
