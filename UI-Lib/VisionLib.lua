@@ -1026,7 +1026,7 @@ function Library:Create(options)
 							Goal = {BackgroundColor3 = Color3.new(0.780392, 0.780392, 0.780392)}
 						})
 					
-						while RunService.RenderStepped:wait() and MouseDown do
+						while MouseDown do
 							local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
 							local value = ((options.Max - options.Min) * percentage) + options.Min
 							value = math.floor(value)
@@ -1037,6 +1037,7 @@ function Library:Create(options)
 								Length = 0.06,
 								Goal = {Size = UDim2.fromScale(percentage, 1)}
 							})
+							task.wait()
 						end
 						Library.Sliding = false
 						
