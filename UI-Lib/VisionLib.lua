@@ -1055,10 +1055,6 @@ function Library:Create(options)
 						MouseDown = false
 					end
 				end)
-				
-				RunService:BindToRenderStep("visionslider_"..options.Name, Enum.RenderPriority.Input.Value, function()
-					
-				end)
 			end
 			
 			Slider:SetValue(options.Default)
