@@ -1016,7 +1016,7 @@ function Library:Create(options)
 					end
 				end)
 				
-				UserInputService.InputBegan:connect(function(key)
+				UserInputService.InputBegan:Connect(function(key)
 					if key.UserInputType == Enum.UserInputType.MouseButton1 and Slider.Hover then
 						Library.Sliding = true
 						MouseDown = true
