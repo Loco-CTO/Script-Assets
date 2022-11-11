@@ -1033,13 +1033,15 @@ function Library:Create(options)
 								value = math.floor(value)
 								Slider.OldVal = value
 								Slider["2b"].Text = value
+
 								options.Callback(value)
 								Library:Tween(Slider["29"], {
 									Length = 0.06,
 									Goal = {Size = UDim2.fromScale(percentage, 1)}
 								})
-								task.wait()
 							end)
+							
+							task.wait()
 						end
 						Library.Sliding = false
 						
