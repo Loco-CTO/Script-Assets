@@ -978,7 +978,7 @@ function Library:Create(options)
 			do
 				local MouseDown
 				
-				Slider["27"].MouseEnter:Connect(function()
+				Slider["23"].MouseEnter:Connect(function()
 					Slider.Hover = true
 					
 					Library:Tween(Slider["29"], {
@@ -987,7 +987,7 @@ function Library:Create(options)
 					})
 				end)
 				
-				Slider["27"].MouseLeave:Connect(function()
+				Slider["23"].MouseLeave:Connect(function()
 					Slider.Hover = false
 					
 					Library:Tween(Slider["29"], {
