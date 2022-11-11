@@ -1027,17 +1027,19 @@ function Library:Create(options)
 						})
 					
 						while MouseDown do
-							local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
-							local value = ((options.Max - options.Min) * percentage) + options.Min
-							value = math.floor(value)
-							Slider.OldVal = value
-							Slider["2b"].Text = value
-							options.Callback(value)
-							Library:Tween(Slider["29"], {
-								Length = 0.06,
-								Goal = {Size = UDim2.fromScale(percentage, 1)}
-							})
-							task.wait()
+							task.spawn(function()
+								local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
+								local value = ((options.Max - options.Min) * percentage) + options.Min
+								value = math.floor(value)
+								Slider.OldVal = value
+								Slider["2b"].Text = value
+								options.Callback(value)
+								Library:Tween(Slider["29"], {
+									Length = 0.06,
+									Goal = {Size = UDim2.fromScale(percentage, 1)}
+								})
+								task.wait()
+							end)
 						end
 						Library.Sliding = false
 						
