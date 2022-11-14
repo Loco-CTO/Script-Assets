@@ -50,7 +50,7 @@ function Library:ToggleGui(toggle, frame)
 		
 		Library:Tween(frame, {
 			Length = 0.5, 
-			Goal = {Size = UDim2.new(0, 0, 0, 0)}
+			Goal = {Size = UDim2.new(0, 431, 0, 0)}
 		})
 		
 		task.spawn(function()
@@ -156,6 +156,7 @@ function Library:Create(options)
 		GUI["2"]["BackgroundColor3"] = Color3.fromRGB(41, 41, 41)
 		GUI["2"]["Size"] = UDim2.new(0, 431, 0, 506)
 		GUI["2"]["ClipsDescendants"] = true
+		GUI["2"]["BorderSizePixel"] = 0
 		GUI["2"]["Position"] = UDim2.new(0.3449864089488983, 0, 0.09605705738067627, 0)
 		GUI["2"]["Name"] = [[MainFrame]]
 
@@ -1021,10 +1022,12 @@ function Library:Create(options)
 						Library.Sliding = true
 						MouseDown = true
 						
-						Library:Tween(Slider["29"], {
-							Length = 0.5,
-							Goal = {BackgroundColor3 = Color3.new(0.780392, 0.780392, 0.780392)}
-						})
+						task.spawn(function()
+							Library:Tween(Slider["29"], {
+								Length = 0.5,
+								Goal = {BackgroundColor3 = Color3.new(0.780392, 0.780392, 0.780392)}
+							})
+						end)
 					
 						while RunService.RenderStepped:wait() and MouseDown do
 							local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
@@ -1044,12 +1047,14 @@ function Library:Create(options)
 						end
 						Library.Sliding = false
 						
-						if Slider.Hover then
-							Library:Tween(Slider["29"], {
-								Length = 0.5,
-								Goal = {BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)}
-							})
-						end
+						task.spawn(function()
+							if Slider.Hover then
+								Library:Tween(Slider["29"], {
+									Length = 0.5,
+									Goal = {BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)}
+								})
+							end
+						end)
 					end
 				end)
 				
