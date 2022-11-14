@@ -1042,7 +1042,7 @@ function Library:Create(options)
 
 							Library:Tween(Slider["29"], {
 								Length = 0.06,
-								Goal = {Size = UDim2.fromScale(((Value - options.Min) / (options.Max - options.Min)), 1)}
+								Goal = {Size = UDim2.fromScale(((value - options.Min) / (options.Max - options.Min)), 1)}
 							})
 							Library.Sliding = true
 						end
