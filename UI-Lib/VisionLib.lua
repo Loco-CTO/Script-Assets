@@ -1,86 +1,34 @@
---[[
- __      ___     _               _    _ _   _      _ _     
- \ \    / (_)   (_)             | |  | (_) | |    (_) |    
-  \ \  / / _ ___ _  ___  _ __   | |  | |_  | |     _| |__  
-   \ \/ / | / __| |/ _ \| '_ \  | |  | | | | |    | | '_ \ 
-    \  /  | \__ \ | (_) | | | | | |__| | | | |____| | |_) |
-     \/   |_|___/_|\___/|_| |_|  \____/|_| |______|_|_.__/ 
-                                                           
-
-    Discord: https://discord.gg/Bp7wFcZeUn
-    
-]]--                                               
-
 -- Services
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local Player = Players.LocalPlayer
-local Mouse = Player:GetMouse() 
+local TextService = game:GetService("TextService")
+local LocalPlayer = Players.LocalPlayer
+
+local Mouse = LocalPlayer:GetMouse() 
 
 -- Var
 local Library = {
-	DragSpeed = 0.1,
-	LockDragging = false,
+	DragSpeed = 0.07,
 	MainFrameHover = false,
 	Sliding = false,
-	TweeningToggle = false
+	Loaded = false
 }
 
+local TabIndex = 0
+
+ScreeenY = Mouse.ViewSizeY
+ScreeenX = Mouse.ViewSizeX
+
 -- Lib
-function Library:ToggleGui(toggle, frame)
-	if toggle == true then
-		frame.Visible = true
-		
-		Library:Tween(frame, {
-			Length = 0.5, 
-			Goal = {Size = UDim2.new(0, 431, 0, 506)}
-		})
-		
-		Library:Tween(frame.DropShadowHolder.DropShadow, {
-			Length = 0.5, 
-			Goal = {ImageTransparency = 0.5}
-		})
-	else
-		Library:Tween(frame.DropShadowHolder.DropShadow, {
-			Length = 0.5, 
-			Goal = {ImageTransparency = 1}
-		})
-		
-		Library:Tween(frame, {
-			Length = 0.5, 
-			Goal = {Size = UDim2.new(0, 431, 0, 0)}
-		})
-		
-		task.spawn(function()
-			task.wait(0.5)
-			frame.Visible = false
-		end)
-	end
-	return
-end
-
-function Library:ToggleNav(toggle, frame)
-	if toggle == true then
-		frame.Position = UDim2.new(-0.455, 0,-0.004, 0)
-		frame.Visible = true
-		Library:Tween(frame, {Length = 0.7, Goal = {Position = UDim2.new(-0, 0,-0.004, 0)}})
-	else
-		frame.Position = UDim2.new(-0, 0,-0.004, 0)
-		Library:Tween(frame, {Length = 0.7, Goal = {Position = UDim2.new(-0.455, 0,-0.004, 0)}})
-	end
-	
-	return true
-end
-
 function Library:Tween(object, options, callback)
 	local options = Library:Place_Defaults({
 		Length = 2,
 		Style = Enum.EasingStyle.Quint,
 		Direction = Enum.EasingDirection.Out
 	}, options)
-	
+
 	callback = callback or function() return end
 
 	local tweeninfo = TweenInfo.new(options.Length, options.Style, options.Direction)
@@ -91,28 +39,57 @@ function Library:Tween(object, options, callback)
 	Tween.Completed:Connect(function()
 		callback()
 	end)
-	
+
 	return Tween
 end
 
 function Library:ResizeCanvas(Tab)
 	local NumChild = 0
 	local ChildOffset = 0
-	
+
 	for i, v in pairs(Tab:GetChildren()) do
 		if v:IsA("Frame") then
 			NumChild += 1
 			ChildOffset = ChildOffset + v.Size.Y.Offset
 		end
 	end
-	
+
 	local NumChildOffset = NumChild * 5
-	
-	local CanvasSizeY = NumChildOffset + ChildOffset + 14
-	
+
+	local CanvasSizeY = NumChildOffset + ChildOffset + 10
+
 	Library:Tween(Tab, {
-		Length = 1,
+		Length = 0.5,
 		Goal = {CanvasSize = UDim2.new(0, 0, 0, CanvasSizeY)}
+	})
+end
+
+function Library:ResizeSection(Section)
+	local SectionContainer = Section:WaitForChild("SectionContainer")
+	
+	local NumChild = 0
+	local ChildOffset = 0
+
+	for i, v in pairs(SectionContainer:GetChildren()) do
+		if v:IsA("Frame") then
+			NumChild += 1
+			ChildOffset = ChildOffset + v.Size.Y.Offset
+		end
+	end
+
+	local NumChildOffset = NumChild * 5
+
+	local ContainerSize = NumChildOffset + ChildOffset + 10
+	local SectionSize = ContainerSize + 26
+
+	Library:Tween(SectionContainer, {
+		Length = 0.5,
+		Goal = {Size = UDim2.new(0, 458, 0, ContainerSize)}
+	})
+	
+	Library:Tween(Section, {
+		Length = 0.5,
+		Goal = {Size = UDim2.new(0, 458, 0, SectionSize)}
 	})
 end
 
@@ -122,2220 +99,2957 @@ function Library:Place_Defaults(defaults, options)
 	for option, value in next, options do
 		defaults[option] = value
 	end
-	
+
 	return defaults
+end
+
+local LibFrame = {}
+do
+	-- StarterGui.Vision Lib v2
+	LibFrame["1"] = Instance.new("ScreenGui")
+	LibFrame["1"]["Name"] = [[Vision Lib v2]]
+	LibFrame["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
+	LibFrame["1"]["Parent"] = (RunService:IsStudio() and LocalPlayer.PlayerGui) or game:GetService("CoreGui")
+	
+	-- StarterGui.Vision Lib v2.NotifFrame
+	LibFrame["81"] = Instance.new("Frame", LibFrame["1"])
+	LibFrame["81"]["Active"] = true
+	LibFrame["81"]["BorderSizePixel"] = 0
+	LibFrame["81"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+	LibFrame["81"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
+	LibFrame["81"]["BackgroundTransparency"] = 1
+	LibFrame["81"]["Size"] = UDim2.new(0.15399999916553497, 0, 0.6330000162124634, 0)
+	LibFrame["81"]["Position"] = UDim2.new(0.925000011920929, 0, 0.6800000071525574, 0)
+	LibFrame["81"]["Name"] = [[NotifFrame]]
+	
+	-- StarterGui.Vision Lib v2.NotifFrame.UIListLayout
+	LibFrame["82"] = Instance.new("UIListLayout", LibFrame["81"])
+	LibFrame["82"]["VerticalAlignment"] = Enum.VerticalAlignment.Bottom
+	LibFrame["82"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Right
+	LibFrame["82"]["Padding"] = UDim.new(0, 5)
+	LibFrame["82"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+
+	-- StarterGui.Vision Lib v2.NotifFrame.UIPadding
+	LibFrame["83"] = Instance.new("UIPadding", LibFrame["81"])
+	LibFrame["83"]["PaddingRight"] = UDim.new(0, 40)
+	LibFrame["83"]["PaddingBottom"] = UDim.new(0, 40)
 end
 
 function Library:Create(options)
 	options = Library:Place_Defaults({
-		Name = "UI Lib",
-		ShadowColor = Color3.new(0, 0, 0),
-		ToggleKey = Enum.KeyCode.RightShift
+		Name = "Vision UI Lib v2",
+		Footer = "By Loco_CTO, Sius and BruhOOFBoi",
+		ToggleKey = Enum.KeyCode.RightShift,
+		LoadedCallback = function() return end,
+		KeySystem = false,
+		Key = "123456",
+		MaxAttempts = 5,
+		DiscordLink = nil,
+		ToggledRelativeYOffset = nil
 	}, options or {})
 	
-	local GUI = {
-		Navagation = false,
-		Visible = false,
+	local Gui = {
 		CurrentTab = nil,
-		ToggleKey = options.ToggleKey
+		CurrentTabIndex = 0,
+		TweeningToggle = false,
+		ToggleKey = options.ToggleKey,
+		Hidden = false,
+		MaxAttempts = options.MaxAttempts,
+		DiscordLink = options.DiscordLink,
+		Key = options.Key
 	}
-	 
-	-- BaseFrame
+	
+	local StartAnimation = {}
+	
+	task.spawn(function()
+		repeat
+			task.wait()
+		until Library.Loaded
+		options.LoadedCallback()
+		
+		if options.ToggledRelativeYOffset ~= nil then
+			Library:Tween(Gui["2"], {
+				Length = 0.3,
+				Goal = {Position = UDim2.new(0.5, 0, 0, ScreeenY-options.ToggledRelativeYOffset-221) }
+			})
+		end
+	end)
+	
 	do
-		-- StarterGui.VisionLib
-		GUI["1"] = Instance.new("ScreenGui")
-		GUI["1"]["Parent"] = (RunService:IsStudio() and Player.PlayerGui) or game:GetService("CoreGui")
-		GUI["1"]["Name"] = [[VisionLib]]
-		GUI["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
+		-- StarterGui.Vision Lib v2.GuiFrame
+		Gui["2"] = Instance.new("Frame", LibFrame["1"])
+		Gui["2"]["BorderSizePixel"] = 0
+		Gui["2"]["AutoLocalize"] = false
+		Gui["2"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["2"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
+		Gui["2"]["BackgroundTransparency"] = 1
+		Gui["2"]["Size"] = UDim2.new(0, 498, 0, 496)
+		Gui["2"]["ClipsDescendants"] = true
+		Gui["2"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
+		Gui["2"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
+		Gui["2"]["Name"] = [[GuiFrame]]
+		Gui["2"]["Visible"] = false
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar
+		Gui["3"] = Instance.new("Frame", Gui["2"])
+		Gui["3"]["ZIndex"] = 2
+		Gui["3"]["BorderSizePixel"] = 0
+		Gui["3"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["3"]["Size"] = UDim2.new(0, 498, 0, 40)
+		Gui["3"]["Position"] = UDim2.new(0, 0, 0, 455)
+		Gui["3"]["Name"] = [[NavBar]]
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.UICorner
+		Gui["4"] = Instance.new("UICorner", Gui["3"])
+		Gui["4"]["CornerRadius"] = UDim.new(0, 4)
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.Time
+		Gui["5"] = Instance.new("TextLabel", Gui["3"])
+		Gui["5"]["BorderSizePixel"] = 0
+		Gui["5"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["5"]["TextSize"] = 14
+		Gui["5"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["5"]["Size"] = UDim2.new(0, 89, 0, 40)
+		Gui["5"]["Text"] = [[14:12]]
+		Gui["5"]["Name"] = [[Time]]
+		Gui["5"]["Font"] = Enum.Font.GothamBold
+		Gui["5"]["BackgroundTransparency"] = 1
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.TabButtonContainer
+		Gui["6"] = Instance.new("ScrollingFrame", Gui["3"])
+		Gui["6"]["Active"] = true
+		Gui["6"]["ScrollingDirection"] = Enum.ScrollingDirection.X
+		Gui["6"]["BorderSizePixel"] = 0
+		Gui["6"]["CanvasSize"] = UDim2.new(0, 439, 0, 0)
+		Gui["6"]["MidImage"] = [[]]
+		Gui["6"]["TopImage"] = [[]]
+		Gui["6"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["6"]["HorizontalScrollBarInset"] = Enum.ScrollBarInset.Always
+		Gui["6"]["BackgroundTransparency"] = 1
+		Gui["6"]["Size"] = UDim2.new(0, 350, 0, 40)
+		Gui["6"]["ScrollBarThickness"] = 2
+		Gui["6"]["Position"] = UDim2.new(0, 86, 0, 0)
+		Gui["6"]["Name"] = [[TabButtonContainer]]
+		Gui["6"]["BottomImage"] = [[]]
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.TabButtonContainer.UIListLayout
+		Gui["7"] = Instance.new("UIListLayout", Gui["6"])
+		Gui["7"]["FillDirection"] = Enum.FillDirection.Horizontal
+		Gui["7"]["Padding"] = UDim.new(0, 7)
+		Gui["7"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.TabButtonContainer.UIPadding
+		Gui["c"] = Instance.new("UIPadding", Gui["6"])
+		Gui["c"]["PaddingTop"] = UDim.new(0, 6)
+		Gui["c"]["PaddingLeft"] = UDim.new(0, 3)
+		
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.LeftControl
+		Gui["15"] = Instance.new("TextButton", Gui["3"])
+		Gui["15"]["BorderSizePixel"] = 0
+		Gui["15"]["AutoButtonColor"] = false
+		Gui["15"]["TextSize"] = 14
+		Gui["15"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["15"]["TextColor3"] = Color3.fromRGB(96, 96, 96)
+		Gui["15"]["Size"] = UDim2.new(0, 18, 0, 40)
+		Gui["15"]["Name"] = [[LeftControl]]
+		Gui["15"]["Text"] = [[<]]
+		Gui["15"]["Font"] = Enum.Font.GothamBold
+		Gui["15"]["Position"] = UDim2.new(0, 458, 0, 0)
+		Gui["15"]["BackgroundTransparency"] = 1
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.RightControl
+		Gui["16"] = Instance.new("TextButton", Gui["3"])
+		Gui["16"]["BorderSizePixel"] = 0
+		Gui["16"]["AutoButtonColor"] = false
+		Gui["16"]["TextSize"] = 14
+		Gui["16"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["16"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["16"]["Size"] = UDim2.new(0, 18, 0, 40)
+		Gui["16"]["Name"] = [[RightControl]]
+		Gui["16"]["Text"] = [[>]]
+		Gui["16"]["Font"] = Enum.Font.GothamBold
+		Gui["16"]["Position"] = UDim2.new(0, 475, 0, 0)
+		Gui["16"]["BackgroundTransparency"] = 1
+
+		-- StarterGui.Vision Lib v2.GuiFrame.NavBar.UIGradient
+		Gui["17"] = Instance.new("UIGradient", Gui["3"])
+		Gui["17"]["Rotation"] = 90
+		Gui["17"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(36, 36, 36)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(25, 25, 25))}
+
+		-- StarterGui.Vision Lib v2.GuiFrame.MainFrame
+		Gui["18"] = Instance.new("Frame", Gui["2"])
+		Gui["18"]["BorderSizePixel"] = 0
+		Gui["18"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["18"]["Size"] = UDim2.new(0, 498, 0, 452)
+		Gui["18"]["Name"] = [[MainFrame]]
+		Gui["18"]["ClipsDescendants"] = true
+
+		-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.UICorner
+		Gui["19"] = Instance.new("UICorner", Gui["18"])
+		Gui["19"]["CornerRadius"] = UDim.new(0, 4)
+
+		-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.UIGradient
+		Gui["1a"] = Instance.new("UIGradient", Gui["18"])
+		Gui["1a"]["Rotation"] = 90
+		Gui["1a"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(46, 46, 46)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(40, 40, 40))}
+
+		-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Seperator
+		Gui["1b"] = Instance.new("Frame", Gui["18"])
+		Gui["1b"]["ZIndex"] = 2
+		Gui["1b"]["BorderSizePixel"] = 0
+		Gui["1b"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55)
+		Gui["1b"]["Size"] = UDim2.new(0, 496, 0, 2)
+		Gui["1b"]["BorderColor3"] = Color3.fromRGB(51, 51, 51)
+		Gui["1b"]["Position"] = UDim2.new(0, 0, 0, 33)
+		Gui["1b"]["Name"] = [[Seperator]]
+
+		-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Title
+		Gui["1c"] = Instance.new("TextLabel", Gui["18"])
+		Gui["1c"]["BorderSizePixel"] = 0
+		Gui["1c"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		Gui["1c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["1c"]["TextSize"] = 15
+		Gui["1c"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Gui["1c"]["Size"] = UDim2.new(0, 212, 0, 27)
+		Gui["1c"]["Text"] = [[Home Tab]]
+		Gui["1c"]["Name"] = [[Title]]
+		Gui["1c"]["Font"] = Enum.Font.GothamBold
+		Gui["1c"]["BackgroundTransparency"] = 1
+		Gui["1c"]["Position"] = UDim2.new(0, 14, 0, 5)
 	end
 	
-	-- Main Frame
 	do
-		-- StarterGui.VisionLib.MainFrame
-		GUI["2"] = Instance.new("Frame", GUI["1"])
-		GUI["2"]["BackgroundColor3"] = Color3.fromRGB(41, 41, 41)
-		GUI["2"]["Size"] = UDim2.new(0, 431, 0, 506)
-		GUI["2"]["ClipsDescendants"] = true
-		GUI["2"]["BorderSizePixel"] = 0
-		GUI["2"]["Position"] = UDim2.new(0.3449864089488983, 0, 0.09605705738067627, 0)
-		GUI["2"]["Name"] = [[MainFrame]]
-
-		-- StarterGui.VisionLib.MainFrame.UICorner
-		GUI["3"] = Instance.new("UICorner", GUI["2"])
-		GUI["3"]["CornerRadius"] = UDim.new(0, 6)
 		
-		-- StarterGui.VisionLib.MainFrame.DropShadowHolder
-		GUI["34"] = Instance.new("Frame", GUI["2"])
-		GUI["34"]["ZIndex"] = 1
-		GUI["34"]["BorderSizePixel"] = 0
-		GUI["34"]["BackgroundTransparency"] = 1
-		GUI["34"]["Size"] = UDim2.new(1, 0, 1, 0)
-		GUI["34"]["Name"] = [[DropShadowHolder]]
-		
-		-- StarterGui.VisionLib.MainFrame.DropShadowHolder.DropShadow
-		GUI["35"] = Instance.new("ImageLabel", GUI["34"])
-		GUI["35"]["ZIndex"] = 0
-		GUI["35"]["BorderSizePixel"] = 0
-		GUI["35"]["SliceCenter"] = Rect.new(49, 49, 450, 450)
-		GUI["35"]["ScaleType"] = Enum.ScaleType.Slice
-		GUI["35"]["ImageColor3"] = Color3.fromRGB(0, 0, 0)
-		GUI["35"]["ImageTransparency"] = 0.5
-		GUI["35"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
-		GUI["35"]["Image"] = [[rbxassetid://6014261993]]
-		GUI["35"]["Size"] = UDim2.new(1, 47, 1, 47)
-		GUI["35"]["Name"] = [[DropShadow]]
-		GUI["35"]["BackgroundTransparency"] = 1
-		GUI["35"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
-		
-		-- StarterGui.VisionLib.ShadowFrame
-		GUI["b9"] = Instance.new("Frame", GUI["1"])
-		GUI["b9"]["ZIndex"] = 0
-		GUI["b9"]["BackgroundColor3"] = Color3.fromRGB(41, 41, 41)
-		GUI["b9"]["BackgroundTransparency"] = 1
-		GUI["b9"]["Size"] = UDim2.new(0, 431, 0, 506)
-		GUI["b9"]["Position"] = UDim2.new(0.3449864089488983, 0, 0.09605705738067627, 0)
-		GUI["b9"]["Name"] = [[ShadowFrame]]
+		-- StarterGui.Vision Lib v2.StartAnimationFrame
+		StartAnimation["91"] = Instance.new("Frame", LibFrame["1"])
+		StartAnimation["91"]["BorderSizePixel"] = 0
+		StartAnimation["91"]["AutoLocalize"] = false
+		StartAnimation["91"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["91"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
+		StartAnimation["91"]["BackgroundTransparency"] = 1
+		StartAnimation["91"]["Size"] = UDim2.new(0, 498, 0, 498)
+		StartAnimation["91"]["ClipsDescendants"] = true
+		StartAnimation["91"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
+		StartAnimation["91"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
+		StartAnimation["91"]["Name"] = [[StartAnimationFrame]]
 
-		-- StarterGui.VisionLib.ShadowFrame.DropShadowHolder
-		GUI["ba"] = Instance.new("Frame", GUI["b9"])
-		GUI["ba"]["BorderSizePixel"] = 0
-		GUI["ba"]["BackgroundTransparency"] = 1
-		GUI["ba"]["Size"] = UDim2.new(1, 0, 1, 0)
-		GUI["ba"]["Name"] = [[DropShadowHolder]]
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main
+		StartAnimation["92"] = Instance.new("Frame", StartAnimation["91"])
+		StartAnimation["92"]["ZIndex"] = 2
+		StartAnimation["92"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["92"]["Size"] = UDim2.new(0, 310, 0, 0)
+		StartAnimation["92"]["Position"] = UDim2.new(0.186, 0, 0.167, 0)
+		StartAnimation["92"]["Name"] = [[Main]]
+		StartAnimation["92"]["ClipsDescendants"] = true
+		StartAnimation["92"]["BorderSizePixel"] = 0
 
-		-- StarterGui.VisionLib.ShadowFrame.DropShadowHolder.DropShadow
-		GUI["bb"] = Instance.new("ImageLabel", GUI["ba"])
-		GUI["bb"]["ZIndex"] = 0
-		GUI["bb"]["BorderSizePixel"] = 0
-		GUI["bb"]["SliceCenter"] = Rect.new(49, 49, 450, 450)
-		GUI["bb"]["ScaleType"] = Enum.ScaleType.Slice
-		GUI["bb"]["ImageColor3"] = options.ShadowColor
-		GUI["bb"]["ImageTransparency"] = 0.5
-		GUI["bb"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
-		GUI["bb"]["Image"] = [[rbxassetid://6014261993]]
-		GUI["bb"]["Size"] = UDim2.new(1, 47, 1, 47)
-		GUI["bb"]["Name"] = [[DropShadow]]
-		GUI["bb"]["BackgroundTransparency"] = 1
-		GUI["bb"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
-	end
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.UIGradient
+		StartAnimation["93"] = Instance.new("UIGradient", StartAnimation["92"])
+		StartAnimation["93"]["Rotation"] = 90
+		StartAnimation["93"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(46, 46, 46)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(40, 40, 40))}
 
-	-- TitleBar
-	do
-		-- StarterGui.VisionLib.MainFrame.TitleBar
-		GUI["4"] = Instance.new("Frame", GUI["2"])
-		GUI["4"]["BackgroundColor3"] = Color3.fromRGB(31, 31, 31)
-		GUI["4"]["Size"] = UDim2.new(0, 430, 0, 35)
-		GUI["4"]["Position"] = UDim2.new(0, 0, -0.001381644164212048, 0)
-		GUI["4"]["Name"] = [[TitleBar]]
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.UICorner
+		StartAnimation["94"] = Instance.new("UICorner", StartAnimation["92"])
+		StartAnimation["94"]["CornerRadius"] = UDim.new(0, 4)
 
-		-- StarterGui.VisionLib.MainFrame.TitleBar.TextLabel
-		GUI["5"] = Instance.new("TextLabel", GUI["4"])
-		GUI["5"]["TextXAlignment"] = Enum.TextXAlignment.Left
-		GUI["5"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["5"]["TextSize"] = 14
-		GUI["5"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["5"]["Size"] = UDim2.new(0, 245, 0, 26)
-		GUI["5"]["Text"] = options.Name
-		GUI["5"]["Font"] = Enum.Font.GothamMedium
-		GUI["5"]["BackgroundTransparency"] = 1
-		GUI["5"]["Position"] = UDim2.new(0.13847187161445618, 0, 0.11800000071525574, 0)
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.Title
+		StartAnimation["95"] = Instance.new("TextLabel", StartAnimation["92"])
+		StartAnimation["95"]["ZIndex"] = 2
+		StartAnimation["95"]["BorderSizePixel"] = 0
+		StartAnimation["95"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		StartAnimation["95"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["95"]["TextSize"] = 20
+		StartAnimation["95"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["95"]["Size"] = UDim2.new(0, 255, 0, 32)
+		StartAnimation["95"]["Text"] = options.Name
+		StartAnimation["95"]["Name"] = [[Title]]
+		StartAnimation["95"]["Font"] = Enum.Font.GothamMedium
+		StartAnimation["95"]["BackgroundTransparency"] = 1
+		StartAnimation["95"]["Position"] = UDim2.new(0, 10, 0, 5)
 
-		-- StarterGui.VisionLib.MainFrame.TitleBar.UICorner
-		GUI["6"] = Instance.new("UICorner", GUI["4"])
-		GUI["6"]["CornerRadius"] = UDim.new(0, 6)
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.Title
+		StartAnimation["96"] = Instance.new("TextLabel", StartAnimation["92"])
+		StartAnimation["96"]["ZIndex"] = 2
+		StartAnimation["96"]["BorderSizePixel"] = 0
+		StartAnimation["96"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		StartAnimation["96"]["TextYAlignment"] = Enum.TextYAlignment.Top
+		StartAnimation["96"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["96"]["TextSize"] = 11
+		StartAnimation["96"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["96"]["Size"] = UDim2.new(0, 255, 0, 18)
+		StartAnimation["96"]["Text"] = options.Footer
+		StartAnimation["96"]["Name"] = [[Title]]
+		StartAnimation["96"]["Font"] = Enum.Font.Gotham
+		StartAnimation["96"]["BackgroundTransparency"] = 1
+		StartAnimation["96"]["Position"] = UDim2.new(0, 12, 0, 32)
 
-		-- StarterGui.VisionLib.MainFrame.TitleBar.Open
-		GUI["7"] = Instance.new("ImageButton", GUI["4"])
-		GUI["7"]["BorderSizePixel"] = 0
-		GUI["7"]["SliceScale"] = 0
-		GUI["7"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["7"]["Image"] = [[rbxassetid://11254241743]]
-		GUI["7"]["Size"] = UDim2.new(0, 26, 0, 26)
-		GUI["7"]["Name"] = [[Open]]
-		GUI["7"]["Position"] = UDim2.new(0.0325581394135952, 0, 0.11428571492433548, 0)
-		GUI["7"]["BackgroundTransparency"] = 1
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.LoadBack
+		StartAnimation["97"] = Instance.new("Frame", StartAnimation["92"])
+		StartAnimation["97"]["ZIndex"] = 2
+		StartAnimation["97"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["97"]["Size"] = UDim2.new(0, 285, 0, 6)
+		StartAnimation["97"]["Position"] = UDim2.new(0.03870967775583267, 0, 0.942219614982605, 0)
+		StartAnimation["97"]["Name"] = [[LoadBack]]
 
-		-- StarterGui.VisionLib.MainFrame.TitleBar.Seperator
-		GUI["8"] = Instance.new("Frame", GUI["4"])
-		GUI["8"]["BorderSizePixel"] = 0
-		GUI["8"]["BackgroundColor3"] = Color3.fromRGB(45, 45, 45)
-		GUI["8"]["BackgroundTransparency"] = 0.009999999776482582
-		GUI["8"]["Size"] = UDim2.new(0, 430, 0, 2)
-		GUI["8"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-		GUI["8"]["Position"] = UDim2.new(0.002320185536518693, 0, 0.9811705946922302, 0)
-		GUI["8"]["Name"] = [[Seperator]]
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.LoadBack.UICorner
+		StartAnimation["98"] = Instance.new("UICorner", StartAnimation["97"])
+		StartAnimation["98"]["CornerRadius"] = UDim.new(0, 7)
 
-		-- StarterGui.VisionLib.MainFrame.TitleBar.Hide
-		GUI["9"] = Instance.new("ImageButton", GUI["4"])
-		GUI["9"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["9"]["Image"] = [[rbxassetid://11255032783]]
-		GUI["9"]["Size"] = UDim2.new(0, 20, 0, 20)
-		GUI["9"]["Name"] = [[Hide]]
-		GUI["9"]["Position"] = UDim2.new(0.9348837733268738, 0, 0.20000000298023224, 0)
-		GUI["9"]["BackgroundTransparency"] = 1
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.LoadBack.LoadFront
+		StartAnimation["99"] = Instance.new("Frame", StartAnimation["97"])
+		StartAnimation["99"]["ZIndex"] = 2
+		StartAnimation["99"]["BackgroundColor3"] = Color3.fromRGB(191, 191, 191)
+		StartAnimation["99"]["Size"] = UDim2.new(0.035087719559669495, 0, 1, 0)
+		StartAnimation["99"]["Position"] = UDim2.new(-0.007017544005066156, 0, 0, 0)
+		StartAnimation["99"]["Name"] = [[LoadFront]]
 
-		-- StarterGui.VisionLib.MainFrame.TitleBar.Settings
-		GUI["a"] = Instance.new("ImageButton", GUI["4"])
-		GUI["a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["a"]["Image"] = [[rbxassetid://11254233757]]
-		GUI["a"]["Size"] = UDim2.new(0, 20, 0, 20)
-		GUI["a"]["Name"] = [[Settings]]
-		GUI["a"]["Position"] = UDim2.new(0.8799999952316284, 0, 0.20000000298023224, 0)
-		GUI["a"]["BackgroundTransparency"] = 1
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.LoadBack.LoadFront.UICorner
+		StartAnimation["9a"] = Instance.new("UICorner", StartAnimation["99"])
+		StartAnimation["9a"]["CornerRadius"] = UDim.new(0, 7)
+
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.LoadBack.LoadFront.UIGradient
+		StartAnimation["9b"] = Instance.new("UIGradient", StartAnimation["99"])
+		StartAnimation["9b"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(75, 75, 75)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(99, 99, 99))}
+
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.CharAva
+		StartAnimation["9c"] = Instance.new("ImageLabel", StartAnimation["92"])
+		StartAnimation["9c"]["ZIndex"] = 2
+		StartAnimation["9c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["9c"]["Image"] = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+		StartAnimation["9c"]["Size"] = UDim2.new(0, 70, 0, 70)
+		StartAnimation["9c"]["Name"] = [[CharAva]]
+		StartAnimation["9c"]["Position"] = UDim2.new(0, 12, 0, 49)
+		StartAnimation["9c"]["BackgroundTransparency"] = 1
+		StartAnimation["9c"]["ImageTransparency"] = 1
+
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.CharAva.UICorner
+		StartAnimation["9d"] = Instance.new("UICorner", StartAnimation["9c"])
+		StartAnimation["9d"]["CornerRadius"] = UDim.new(1, 8)
+
+		-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.WelcomeText
+		StartAnimation["9e"] = Instance.new("TextLabel", StartAnimation["92"])
+		StartAnimation["9e"]["TextWrapped"] = true
+		StartAnimation["9e"]["ZIndex"] = 2
+		StartAnimation["9e"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		StartAnimation["9e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["9e"]["TextSize"] = 19
+		StartAnimation["9e"]["TextTransparency"] = 1
+		StartAnimation["9e"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		StartAnimation["9e"]["Size"] = UDim2.new(0, 282, 0, 70)
+		StartAnimation["9e"]["Text"] = [[Welcome, ]]..Players.LocalPlayer.Name
+		StartAnimation["9e"]["Name"] = [[WelcomeText]]
+		StartAnimation["9e"]["Font"] = Enum.Font.GothamMedium
+		StartAnimation["9e"]["BackgroundTransparency"] = 1
+		StartAnimation["9e"]["Position"] = UDim2.new(0, 98, 0, 49)
 	end
 	
-	-- NavagationBar
+	-- Start animation
 	do
-		-- StarterGui.VisionLib.MainFrame.NavagationBar
-		GUI["27"] = Instance.new("Frame", GUI["2"])
-		GUI["27"]["ZIndex"] = 3
-		GUI["27"]["BackgroundColor3"] = Color3.fromRGB(27, 27, 27)
-		GUI["27"]["Size"] = UDim2.new(0, 196, 0, 504)
-		GUI["27"]["Position"] = UDim2.new(0.002261430025100708, 0, -0.00020906329154968262, 0)
-		GUI["27"]["Visible"] = false
-		GUI["27"]["Name"] = [[NavagationBar]]
+		task.spawn(function()
+			Library.Sliding = true
+			
+			Library:Tween(StartAnimation["92"], {
+				Length = 1,
+				Goal = {Size = UDim2.new(0, 310, 0, 230)}
+			})
+			
+			task.wait(1)
+			
+			
+			Library:Tween(StartAnimation["99"], {
+				Length = 2.7,
+				Direction = Enum.EasingDirection.In,
+				Goal = {Size = UDim2.new(1, 0, 1, 0)}
+			})
+			task.wait(2.7)
+			
+			Library:Tween(StartAnimation["97"], {
+				Length = 0.5,
+				Goal = {BackgroundTransparency = 1}
+			})
+			
+			Library:Tween(StartAnimation["99"], {
+				Length = 0.5,
+				Goal = {BackgroundTransparency = 1}
+			})
+			
+			local KeyChecked = false
+			
+			if options.KeySystem then
+				local KeySystem = {
+					CorrectKey = false,
+					KeyTextboxHover = false,
+					Attempts = Gui.MaxAttempts
+				}
+				
+				do
+					-- StarterGui.Vision Lib v2.StartAnimationFrame.Main.Key
+					KeySystem["a0"] = Instance.new("Frame", StartAnimation["92"])
+					KeySystem["a0"]["ZIndex"] = 3
+					KeySystem["a0"]["BackgroundColor3"] = Color3.fromRGB(149, 149, 149)
+					KeySystem["a0"]["Size"] = UDim2.new(0, 253, 0, 20)
+					KeySystem["a0"]["Position"] = UDim2.new(0, 28, 0, 33)
+					KeySystem["a0"]["Name"] = [[Key]]
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.UICorner
-		GUI["28"] = Instance.new("UICorner", GUI["27"])
-		GUI["28"]["CornerRadius"] = UDim.new(0, 6)
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.Key.UICorner
+					KeySystem["a1"] = Instance.new("UICorner", KeySystem["a0"])
+					KeySystem["a1"]["CornerRadius"] = UDim.new(0, 4)
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.Seperator
-		GUI["29"] = Instance.new("Frame", GUI["27"])
-		GUI["29"]["ZIndex"] = 2
-		GUI["29"]["BorderSizePixel"] = 0
-		GUI["29"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-		GUI["29"]["BackgroundTransparency"] = 0.009999999776482582
-		GUI["29"]["Size"] = UDim2.new(0, 194, 0, 2)
-		GUI["29"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-		GUI["29"]["Position"] = UDim2.new(0.007422310765832663, 0, 0.13464957475662231, 0)
-		GUI["29"]["Name"] = [[Seperator]]
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.Key.UIStroke
+					KeySystem["a2"] = Instance.new("UIStroke", KeySystem["a0"])
+					KeySystem["a2"]["Color"] = Color3.fromRGB(43, 43, 43)
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame
-		GUI["2a"] = Instance.new("ScrollingFrame", GUI["27"])
-		GUI["2a"]["Active"] = true
-		GUI["2a"]["ZIndex"] = 2
-		GUI["2a"]["CanvasSize"] = UDim2.new(0, 0, 1, 0)
-		GUI["2a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["2a"]["BackgroundTransparency"] = 1
-		GUI["2a"]["Size"] = UDim2.new(0, 166, 0, 427)
-		GUI["2a"]["ScrollBarImageColor3"] = Color3.fromRGB(0, 0, 0)
-		GUI["2a"]["ScrollBarThickness"] = 0
-		GUI["2a"]["Position"] = UDim2.new(0.07653061300516129, 0, 0.15427041053771973, 0)
-		GUI["2a"]["Name"] = [[ScrollFrame]]
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.Key.UIGradient
+					KeySystem["a3"] = Instance.new("UIGradient", KeySystem["a0"])
+					KeySystem["a3"]["Rotation"] = 270
+					KeySystem["a3"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(86, 86, 86)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(89, 89, 89))}
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.UIPadding
-		GUI["2f"] = Instance.new("UIPadding", GUI["2a"])
-		GUI["2f"]["PaddingTop"] = UDim.new(0, 3)
-		GUI["2f"]["PaddingLeft"] = UDim.new(0, 23)
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.Key.TextBox
+					KeySystem["a4"] = Instance.new("TextBox", KeySystem["a0"])
+					KeySystem["a4"]["CursorPosition"] = -1
+					KeySystem["a4"]["PlaceholderColor3"] = Color3.fromRGB(127, 127, 127)
+					KeySystem["a4"]["ZIndex"] = 3
+					KeySystem["a4"]["RichText"] = true
+					KeySystem["a4"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["a4"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					KeySystem["a4"]["TextSize"] = 11
+					KeySystem["a4"]["BackgroundColor3"] = Color3.fromRGB(51, 51, 51)
+					KeySystem["a4"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
+					KeySystem["a4"]["PlaceholderText"] = [[Key | e.g abc123]]
+					KeySystem["a4"]["Size"] = UDim2.new(0.8999999761581421, 0, 0.8999999761581421, 0)
+					KeySystem["a4"]["Text"] = [[]]
+					KeySystem["a4"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
+					KeySystem["a4"]["Font"] = Enum.Font.Gotham
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.UIListLayout
-		GUI["30"] = Instance.new("UIListLayout", GUI["2a"])
-		GUI["30"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.Key.TextBox.UICorner
+					KeySystem["a5"] = Instance.new("UICorner", KeySystem["a4"])
+					KeySystem["a5"]["CornerRadius"] = UDim.new(0, 4)
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.Banner
-		GUI["2f"] = Instance.new("ImageLabel", GUI["27"])
-		GUI["2f"]["ZIndex"] = 2
-		GUI["2f"]["BackgroundColor3"] = Color3.fromRGB(44, 44, 44)
-		GUI["2f"]["ImageColor3"] = Color3.fromRGB(213, 213, 213)
-		GUI["2f"]["Image"] = [[rbxassetid://11254912640]]
-		GUI["2f"]["Size"] = UDim2.new(0, 182, 0, 54)
-		GUI["2f"]["Name"] = [[Banner]]
-		GUI["2f"]["Position"] = UDim2.new(0.0357142873108387, 0, 0.01587301678955555, 0)
-		GUI["2f"]["BorderSizePixel"] = 0
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.KeySystemTitle
+					KeySystem["a6"] = Instance.new("TextLabel", StartAnimation["92"])
+					KeySystem["a6"]["ZIndex"] = 2
+					KeySystem["a6"]["BorderSizePixel"] = 0
+					KeySystem["a6"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					KeySystem["a6"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["a6"]["TextSize"] = 11
+					KeySystem["a6"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["a6"]["Size"] = UDim2.new(0, 158, 0, 16)
+					KeySystem["a6"]["Text"] = [[Key System]]
+					KeySystem["a6"]["Name"] = [[KeySystemTitle]]
+					KeySystem["a6"]["Font"] = Enum.Font.GothamMedium
+					KeySystem["a6"]["BackgroundTransparency"] = 1
+					KeySystem["a6"]["Position"] = UDim2.new(0, 34, 0, 14)
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.Banner.UICorner
-		GUI["32"] = Instance.new("UICorner", GUI["2f"])
-		GUI["32"]["CornerRadius"] = UDim.new(0, 6)
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.KeySystemNote
+					KeySystem["a8"] = Instance.new("Frame", StartAnimation["92"])
+					KeySystem["a8"]["ZIndex"] = 3
+					KeySystem["a8"]["BackgroundColor3"] = Color3.fromRGB(27, 27, 27)
+					KeySystem["a8"]["Size"] = UDim2.new(0, 215, 0, 50)
+					KeySystem["a8"]["Position"] = UDim2.new(0, 49, 0, 61)
+					KeySystem["a8"]["Name"] = [[KeySystemNote]]
 
-		-- StarterGui.VisionLib.MainFrame.NavagationBar.Close
-		GUI["33"] = Instance.new("ImageButton", GUI["27"])
-		GUI["33"]["ZIndex"] = 3
-		GUI["33"]["BorderSizePixel"] = 0
-		GUI["33"]["SliceScale"] = 0
-		GUI["33"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-		GUI["33"]["Image"] = [[rbxassetid://11254839668]]
-		GUI["33"]["Size"] = UDim2.new(0, 26, 0, 26)
-		GUI["33"]["Name"] = [[Close]]
-		GUI["33"]["Position"] = UDim2.new(0.04100000113248825, 0, 0.009999999776482582, 0)
-		GUI["33"]["BackgroundTransparency"] = 1
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.KeySystemNote.TextLabel
+					KeySystem["a9"] = Instance.new("TextLabel", KeySystem["a8"])
+					KeySystem["a9"]["TextWrapped"] = true
+					KeySystem["a9"]["ZIndex"] = 2
+					KeySystem["a9"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					KeySystem["a9"]["TextYAlignment"] = Enum.TextYAlignment.Top
+					KeySystem["a9"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["a9"]["TextSize"] = 9
+					KeySystem["a9"]["TextColor3"] = Color3.fromRGB(205, 205, 205)
+					KeySystem["a9"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
+					KeySystem["a9"]["Size"] = UDim2.new(0.949999988079071, 0, 0.800000011920929, 0)
+					KeySystem["a9"]["Text"] = [[Note: Join our discord to get the key!]]
+					KeySystem["a9"]["Font"] = Enum.Font.Gotham
+					KeySystem["a9"]["BackgroundTransparency"] = 1
+					KeySystem["a9"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
+					
+					KeySystem["a0"]["BackgroundTransparency"] = 1
+					KeySystem["a4"]["BackgroundTransparency"] = 1
+					KeySystem["a8"]["BackgroundTransparency"] = 1
+					KeySystem["a4"]["TextTransparency"] = 1
+					KeySystem["a9"]["TextTransparency"] = 1
+					KeySystem["a6"]["TextTransparency"] = 1
+
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.KeySystemNote.UICorner
+					KeySystem["aa"] = Instance.new("UICorner", KeySystem["a8"])
+					
+					-- Methods
+					do
+						KeySystem["a0"].MouseEnter:Connect(function()
+							Library:Tween(KeySystem["a2"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(93, 93, 93)}
+							})
+							
+							KeySystem.KeyTextboxHover = true
+						end)
+						
+						KeySystem["a0"].MouseLeave:Connect(function()
+							Library:Tween(KeySystem["a2"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(43, 43, 43)}
+							})
+							
+							KeySystem.KeyTextboxHover = false
+						end)
+						
+						KeySystem["a4"].FocusLost:Connect(function()
+							local keyEntered = KeySystem["a4"]["Text"]
+							
+							if keyEntered ~= "" then
+
+								if keyEntered == Gui.Key then
+									KeySystem.CorrectKey = true
+
+									Library:ForceNotify({
+										Name = "KeySystem",
+										Text = "Correct key!",
+										Icon = "rbxassetid://11401835376",
+										Duration = 3
+									})
+								else
+									KeySystem.Attempts -= 1
+
+									Library:ForceNotify({
+										Name = "KeySystem",
+										Text = "Incorrect key! You still have "..tostring(KeySystem.Attempts).." attempts left!",
+										Icon = "rbxassetid://11401835376",
+										Duration = 3
+									})
+								end
+
+								KeySystem["a4"]["Text"] = ""
+
+								if KeySystem.Attempts == 0 then
+									game.Players.LocalPlayer:Kick("Too many failed attempts")
+								end
+
+								if KeySystem.KeyTextboxHover then
+									Library:Tween(KeySystem["a2"], {
+										Length = 0.2,
+										Goal = {Color = Color3.fromRGB(93, 93, 93)}
+									})
+								else
+									Library:Tween(KeySystem["a2"], {
+										Length = 0.2,
+										Goal = {Color = Color3.fromRGB(43, 43, 43)}
+									})
+								end
+							end
+						end)
+					end
+				end
+				
+				
+				do
+					-- Others tween
+					do
+						Library:Tween(StartAnimation["92"], {
+							Length = 1,
+							Goal = {Position = UDim2.new(0, 92, 0, 159)}
+						})
+
+						Library:Tween(StartAnimation["92"], {
+							Length = 1,
+							Goal = {Size = UDim2.new(0, 310, 0, 154)}
+						})
+						
+
+						Library:Tween(StartAnimation["96"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 1}
+						})
+
+						Library:Tween(StartAnimation["95"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 1}
+						})
+					end
+					
+					task.wait(1)
+					
+					-- Ui tween
+					do
+						Library:Tween(KeySystem["a4"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 0}
+						})
+						
+						Library:Tween(KeySystem["a9"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 0}
+						})
+						
+						Library:Tween(KeySystem["a6"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 0}
+						})
+						
+						Library:Tween(KeySystem["a8"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 0}
+						})
+						
+						Library:Tween(KeySystem["a4"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 0}
+						})
+						
+						Library:Tween(KeySystem["a0"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 0}
+						})
+					end
+				end
+				
+				if Gui.DiscordLink ~= nil then
+					
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.DiscordServerButton
+					KeySystem["ab"] = Instance.new("TextButton", StartAnimation["92"])
+					KeySystem["ab"]["TextStrokeTransparency"] = 0
+					KeySystem["ab"]["ZIndex"] = 3
+					KeySystem["ab"]["AutoButtonColor"] = false
+					KeySystem["ab"]["TextSize"] = 12
+					KeySystem["ab"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["ab"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["ab"]["Size"] = UDim2.new(0, 100, 0, 19)
+					KeySystem["ab"]["Name"] = [[DiscordServerButton]]
+					KeySystem["ab"]["Text"] = [[Copy discord invite]]
+					KeySystem["ab"]["Font"] = Enum.Font.Gotham
+					KeySystem["ab"]["Position"] = UDim2.new(0, 104, 0, 118)
+					KeySystem["ab"]["MaxVisibleGraphemes"] = 0
+
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.DiscordServerButton.TextLabel
+					KeySystem["ac"] = Instance.new("TextLabel", KeySystem["ab"])
+					KeySystem["ac"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["ac"]["TextStrokeColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["ac"]["TextSize"] = 9
+					KeySystem["ac"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					KeySystem["ac"]["Size"] = UDim2.new(1, 0, 1, 0)
+					KeySystem["ac"]["Text"] = [[Copy discord invite]]
+					KeySystem["ac"]["Font"] = Enum.Font.GothamMedium
+					KeySystem["ac"]["BackgroundTransparency"] = 1
+
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.DiscordServerButton.UIStroke
+					KeySystem["ad"] = Instance.new("UIStroke", KeySystem["ab"])
+					KeySystem["ad"]["Color"] = Color3.fromRGB(89, 102, 243)
+					KeySystem["ad"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
+
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.DiscordServerButton.UIGradient
+					KeySystem["ae"] = Instance.new("UIGradient", KeySystem["ab"])
+					KeySystem["ae"]["Rotation"] = 90
+					KeySystem["ae"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(89, 102, 243)),ColorSequenceKeypoint.new(0.516, Color3.fromRGB(78, 90, 213)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(63, 74, 172))}
+
+					-- StarterGui.Vision Lib v2.KeySystemFrame.Main.DiscordServerButton.UICorner
+					KeySystem["af"] = Instance.new("UICorner", KeySystem["ab"])
+					KeySystem["af"]["CornerRadius"] = UDim.new(0, 4)
+					
+					KeySystem["ab"]["BackgroundTransparency"] = 1
+					KeySystem["ac"]["TextTransparency"] = 1
+					KeySystem["ad"]["Transparency"] = 1
+					
+					do
+						Library:Tween(KeySystem["ad"], {
+							Length = 0.7,
+							Goal = {Transparency = 0}
+						})
+						
+						Library:Tween(KeySystem["ab"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 0}
+						})
+						
+						Library:Tween(KeySystem["ac"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 0}
+						})
+					end
+					
+					-- Handler
+					do
+						KeySystem["ab"].MouseEnter:Connect(function()
+							Library:Tween(KeySystem["ad"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(137, 145, 213)}
+							})
+						end)
+						
+						KeySystem["ab"].MouseLeave:Connect(function()
+							Library:Tween(KeySystem["ad"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(89, 102, 243)}
+							})
+						end)
+						
+						KeySystem["ab"].MouseButton1Click:Connect(function()
+							
+							task.spawn(function()
+								Library:ForceNotify({
+									Name = "Discord",
+									Text = "Copied the discord link to clipboard!",
+									Icon = "rbxassetid://11401835376",
+									Duration = 3
+								})
+								
+								Library:Tween(KeySystem["ad"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(183, 188, 213)}
+								})
+								
+								task.wait(0.2)
+
+								Library:Tween(KeySystem["ad"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(137, 145, 213)}
+								})
+							end)
+							
+							pcall(function()
+								setclipboard(Gui.DiscordLink)
+							end)
+						end)
+					end
+				end
+				
+				repeat
+					task.wait()
+				until KeySystem.CorrectKey
+				
+				do
+					do
+						Library:Tween(KeySystem["a4"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 1}
+						})
+
+						Library:Tween(KeySystem["a9"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 1}
+						})
+
+						Library:Tween(KeySystem["a6"], {
+							Length = 0.7,
+							Goal = {TextTransparency = 1}
+						})
+
+						Library:Tween(KeySystem["a8"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 1}
+						})
+
+						Library:Tween(KeySystem["a4"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 1}
+						})
+
+						Library:Tween(KeySystem["a0"], {
+							Length = 0.7,
+							Goal = {BackgroundTransparency = 1}
+						})
+						
+						Library:Tween(KeySystem["a2"], {
+							Length = 0.7,
+							Goal = {Transparency = 1}
+						})
+					end
+					
+					if Gui.DiscordLink ~= nil then
+						do
+							Library:Tween(KeySystem["ad"], {
+								Length = 0.7,
+								Goal = {Transparency = 1}
+							})
+
+							Library:Tween(KeySystem["ab"], {
+								Length = 0.7,
+								Goal = {BackgroundTransparency = 1}
+							})
+
+							Library:Tween(KeySystem["ac"], {
+								Length = 0.7,
+								Goal = {TextTransparency = 1}
+							})
+						end
+					end
+				end
+				
+				task.wait(1)
+				
+				Library:Tween(StartAnimation["96"], {
+					Length = 0.7,
+					Goal = {TextTransparency = 0}
+				})
+
+				Library:Tween(StartAnimation["95"], {
+					Length = 0.7,
+					Goal = {TextTransparency = 0}
+				})
+				
+				KeyChecked = true
+			else
+				KeyChecked = true
+			end
+			
+			repeat
+				task.wait()
+			until KeyChecked
+			
+			task.wait(0.3)
+			
+			Library:Tween(StartAnimation["92"], {
+				Length = 1,
+				Goal = {Position = UDim2.new(0, 0, 0, 0)}
+			})
+
+			Library:Tween(StartAnimation["92"], {
+				Length = 1,
+				Goal = {Size = UDim2.new(0, 498, 0, 452)}
+			})
+
+			Library:Tween(StartAnimation["9e"], {
+				Length = 0.7,
+				Goal = {TextTransparency = 0}
+			})
+
+			Library:Tween(StartAnimation["9c"] , {
+				Length = 0.7,
+				Goal = {ImageTransparency = 0}
+			})
+
+			Library:Tween(StartAnimation["9c"], {
+				Length = 0.7,
+				Goal = {BackgroundTransparency = 0}
+			})
+			
+			task.wait(1)
+			
+			Gui["2"]["Size"] = UDim2.new(0, 498, 0, 0)
+			Gui["2"]["Visible"] = true
+						
+			task.wait(1.8)
+			
+			Library:Tween(StartAnimation["96"], {
+				Length = 0.7,
+				Goal = {TextTransparency = 1}
+			})
+
+			Library:Tween(StartAnimation["95"], {
+				Length = 0.7,
+				Goal = {TextTransparency = 1}
+			})
+			
+			Library:Tween(StartAnimation["9e"], {
+				Length = 0.7,
+				Goal = {TextTransparency = 1}
+			})
+
+			Library:Tween(StartAnimation["9c"], {
+				Length = 0.7,
+				Goal = {ImageTransparency = 1}
+			})
+
+			Library:Tween(StartAnimation["9c"], {
+				Length = 0.7,
+				Goal = {BackgroundTransparency = 1}
+			})
+			
+			task.wait(0.1)
+			
+			Gui["3"]["Position"] = UDim2.new(0, 0, 0, 300)
+			Gui["2"]["Size"] = UDim2.new(0, 498, 0, 498)
+			
+			Library:Tween(Gui["3"], {
+				Length = 1.5,
+				Goal = {Position = UDim2.new(0, 0, 0, 455)}
+			})
+			
+			task.wait(2)
+			
+			Library:Tween(StartAnimation["92"], {
+				Length = 0.5,
+				Goal = {BackgroundTransparency = 1}
+			})
+			
+			Library.Sliding = false
+			Library.Loaded = true
+		end)
 	end
 	
-	function GUI:Tab(options)
+	function Gui:Tab(options)
 		options = Library:Place_Defaults({
 			Name = "Tab",
-			Icon = "rbxassetid://11254763826",
-			Hidden = false
+			Icon = "rbxassetid://11396131982",
+			Color = Color3.new(1, 0.290196, 0.290196)
 		}, options or {})
 		
 		local Tab = {
-			Hover = false,
 			Active = false,
-			Hidden = options.Hidden
+			Hover = false,
+			Index = TabIndex
 		}
 		
-		do
-			if options.Hidden == false then
-				-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.ButtonFrame
-				Tab["29"] = Instance.new("Frame", GUI["2a"])
-				Tab["29"]["ZIndex"] = 2
-				Tab["29"]["BorderSizePixel"] = 0
-				Tab["29"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Tab["29"]["BackgroundTransparency"] = 1
-				Tab["29"]["Size"] = UDim2.new(0, 123, 0, 33)
-				Tab["29"]["Position"] = UDim2.new(0.1265062391757965, 0, 0.011693159118294716, 0)
-				Tab["29"]["Name"] = [[ButtonFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.ButtonFrame.Button
-				Tab["2a"] = Instance.new("TextButton", Tab["29"])
-				Tab["2a"]["AutoButtonColor"] = false
-				Tab["2a"]["ZIndex"] = 2
-				Tab["2a"]["TextSize"] = 14
-				Tab["2a"]["BackgroundColor3"] = Color3.fromRGB(27, 27, 27)
-				Tab["2a"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Tab["2a"]["Size"] = UDim2.new(0, 166, 0, 30)
-				Tab["2a"]["Name"] = [[Button]]
-				Tab["2a"]["Text"] = [[]]
-				Tab["2a"]["Font"] = Enum.Font.Gotham
-				Tab["2a"]["Position"] = UDim2.new(-0.17090019583702087, 0, -0.11897826939821243, 0)
-
-				-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.ButtonFrame.Button.UICorner
-				Tab["2b"] = Instance.new("UICorner", Tab["2a"])
-				Tab["2b"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.ButtonFrame.Button.TextLabel
-				Tab["2c"] = Instance.new("TextLabel", Tab["2a"])
-				Tab["2c"]["Text"] = options.Name
-				Tab["2c"]["ZIndex"] = 5
-				Tab["2c"]["BorderSizePixel"] = 0
-				Tab["2c"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Tab["2c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Tab["2c"]["TextSize"] = 14
-				Tab["2c"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Tab["2c"]["Size"] = UDim2.new(0, 129, 0, 20)
-				Tab["2c"]["Font"] = Enum.Font.Gotham
-				Tab["2c"]["BackgroundTransparency"] = 1
-				Tab["2c"]["Position"] = UDim2.new(0.2049439251422882, 0, 0.17399999499320984, 0)
-
-				-- StarterGui.VisionLib.MainFrame.NavagationBar.ScrollFrame.ButtonFrame.Icon
-				Tab["2d"] = Instance.new("ImageLabel", Tab["29"])
-				Tab["2d"]["ZIndex"] = 3
-				Tab["2d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Tab["2d"]["Image"] = options.Icon
-				Tab["2d"]["Size"] = UDim2.new(0, 20, 0, 20)
-				Tab["2d"]["Name"] = [[Icon]]
-				Tab["2d"]["BackgroundTransparency"] = 1
-				Tab["2d"]["Position"] = UDim2.new(-0.12800000607967377, 0, 0.019999999552965164, 0)
-
-				Tab["2a"].MouseEnter:Connect(function()
-					Tab.Hover = true
-
-					Library:Tween(Tab["2c"], {
-						Length = 0.2,
-						Goal = {TextColor3 = Color3.fromRGB(136, 103, 177)}
-					})
-					Library:Tween(Tab["2d"], {
-						Length = 0.2,
-						Goal = {ImageColor3 = Color3.fromRGB(136, 103, 177)}
-					})
-				end)
-
-				Tab["2a"].MouseLeave:Connect(function()
-					Tab.Hover = false
-
-					Library:Tween(Tab["2c"], {
-						Length = 0.2,
-						Goal = {TextColor3 = Color3.fromRGB(255, 255, 255)}
-					})
-					Library:Tween(Tab["2d"], {
-						Length = 0.2,
-						Goal = {ImageColor3 = Color3.fromRGB(255, 255, 255)}
-					})
-				end)
-
-				Tab["2a"].MouseButton1Click:Connect(function()
-					if not Tab.Active then
-						Tab:Activate()
-					end
-				end)
-			end
-		end
+		TabIndex += 1
 		
 		do
-			Tab["b"] = Instance.new("ScrollingFrame", GUI["2"])
-			Tab["b"]["Active"] = true
+			-- StarterGui.Vision Lib v2.GuiFrame.NavBar.TabButtonContainer.TabButton
+			Tab["8"] = Instance.new("Frame", Gui["6"])
+			Tab["8"]["BorderSizePixel"] = 0
+			Tab["8"]["BackgroundColor3"] = Color3.fromRGB(74, 74, 74)
+			Tab["8"]["Size"] = UDim2.new(0, 28, 0, 28)
+			Tab["8"]["Name"] = [[TabButton]]
+
+			-- StarterGui.Vision Lib v2.GuiFrame.NavBar.TabButtonContainer.TabButton.UICorner
+			Tab["9"] = Instance.new("UICorner", Tab["8"])
+			Tab["9"]["CornerRadius"] = UDim.new(0, 5)
+
+			-- StarterGui.Vision Lib v2.GuiFrame.NavBar.TabButtonContainer.TabButton.ImageLabel
+			Tab["b"] = Instance.new("ImageLabel", Tab["8"])
+			Tab["b"]["ZIndex"] = 2
 			Tab["b"]["BorderSizePixel"] = 0
 			Tab["b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+			Tab["b"]["ImageColor3"] = Color3.fromRGB(245, 245, 245)
+			Tab["b"]["Image"] = options.Icon
+			Tab["b"]["Size"] = UDim2.new(0, 22, 0, 22)
 			Tab["b"]["BackgroundTransparency"] = 1
-			Tab["b"]["Size"] = UDim2.new(0, 431, 0, 471)
-			Tab["b"]["ScrollBarImageColor3"] = Color3.fromRGB(78, 78, 78)
-			Tab["b"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-			Tab["b"]["ScrollBarThickness"] = 5
-			Tab["b"]["Position"] = UDim2.new(0, 0, 0.06916996091604233, 0)
-			Tab["b"]["Name"] = [[MainContainer]]
-			Tab["b"]["CanvasSize"] = UDim2.new(0, 0, 0, 0)
-			Tab["b"]["ClipsDescendants"] = true
-
-			Tab["c"] = Instance.new("UIListLayout", Tab["b"])
-			Tab["c"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center
-			Tab["c"]["Padding"] = UDim.new(0, 5)
-			Tab["c"]["SortOrder"] = Enum.SortOrder.LayoutOrder
-
-			Tab["d"] = Instance.new("UIPadding", Tab["b"])
-			Tab["d"]["PaddingTop"] = UDim.new(0, 7)
-			
-			Tab["b"].Visible = false
-		end
-	
-		-- Handler
-		do	
-			function Tab:Activate()
-				if not Tab.Active then
-					if GUI.CurrentTab ~= nil then
-						GUI.CurrentTab:Deactivate()
-					end
-					
-					Tab.Active = true
-					
-					if not Tab.Hidden then
-						Library:Tween(Tab["2a"], {
-							Length = 0.2,
-							Goal = {BackgroundColor3 = Color3.fromRGB(3, 3, 3)}
-						})
-					end
-					
-					if GUI.Navagation then
-						GUI.Navagation = false
-						Library:ToggleNav(GUI.Navagation, GUI["27"])
-					end
-					
-					Tab["b"].Visible = true
-					GUI.CurrentTab = Tab
-				end
-			end
-			
-			function Tab:Deactivate()
-				if Tab.Active then
-					Tab.Active = false
-					Tab.Hover = false
-					
-					Tab["b"].Visible = false
-					
-					if not options.Hidden then
-						Library:Tween(Tab["2a"], {
-							Length = 0.2,
-							Goal = {BackgroundColor3 = Color3.fromRGB(26, 26, 26)}
-						})
-					end
-				end
-			end
-			
-			if GUI.CurrentTab == nil then
-				if not options.Hidden then
-					Tab:Activate()
-				end
-			end
+			Tab["b"]["Position"] = UDim2.new(0.1071428582072258, 0, 0.1071428582072258, 0)
 		end
 		
-		-- Sections
+		-- Container
+		do
+			-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container
+			Tab["1d"] = Instance.new("ScrollingFrame", Gui["18"])
+			Tab["1d"]["Active"] = true
+			Tab["1d"]["ScrollingDirection"] = Enum.ScrollingDirection.Y
+			Tab["1d"]["BorderSizePixel"] = 0
+			Tab["1d"]["CanvasSize"] = UDim2.new(0, 0, 0, 0)
+			Tab["1d"]["CanvasPosition"] = Vector2.new(0, 150)
+			Tab["1d"]["ScrollBarImageTransparency"] = 1
+			Tab["1d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+			Tab["1d"]["BackgroundTransparency"] = 1
+			Tab["1d"]["Size"] = UDim2.new(0, 498, 0, 417)
+			Tab["1d"]["ScrollBarImageColor3"] = Color3.fromRGB(20, 20, 20)
+			Tab["1d"]["ScrollBarThickness"] = 5
+			Tab["1d"]["Position"] = UDim2.new(0, 0, 0, 35)
+			Tab["1d"]["Name"] = [[Container]]
+			Tab["1d"]["Visible"] = false
+			
+			-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.UIPadding
+			Tab["7c"] = Instance.new("UIPadding", Tab["1d"])
+			Tab["7c"]["PaddingTop"] = UDim.new(0, 5)
+			Tab["7c"]["PaddingLeft"] = UDim.new(0, 20)
+
+			-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.UIListLayout
+			Tab["7d"] = Instance.new("UIListLayout", Tab["1d"])
+			Tab["7d"]["Padding"] = UDim.new(0, 5)
+			Tab["7d"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+		end
+		
 		function Tab:Section(options)
 			options = Library:Place_Defaults({
-				Name = "Section",
+				Name = "Section"
 			}, options or {})
-
+			
 			local Section = {}
-
+			
+			-- Section and Container
 			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SectionFrame
-				Section["c"] = Instance.new("Frame", Tab["b"])
-				Section["c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Section["c"]["BackgroundTransparency"] = 1
-				Section["c"]["Size"] = UDim2.new(0, 400, 0, 28)
-				Section["c"]["Position"] = UDim2.new(0.03596287593245506, 0, 0, 0)
-				Section["c"]["Name"] = [[SectionFrame]]
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame
+				Section["1e"] = Instance.new("Frame", Tab["1d"])
+				Section["1e"]["BorderSizePixel"] = 0
+				Section["1e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+				Section["1e"]["Size"] = UDim2.new(0, 458, 0, 385)
+				Section["1e"]["Position"] = UDim2.new(0, 0, 0, -150)
+				Section["1e"]["Name"] = [[SectionFrame]]
 
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SectionFrame.TextLabel
-				Section["d"] = Instance.new("TextLabel", Section["c"])
-				Section["d"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Section["d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Section["d"]["TextSize"] = 12
-				Section["d"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Section["d"]["Size"] = UDim2.new(0, 400, 0, 19)
-				Section["d"]["Text"] = options.Name
-				Section["d"]["Font"] = Enum.Font.Gotham
-				Section["d"]["BackgroundTransparency"] = 1
-				Section["d"]["Position"] = UDim2.new(0, 0, 0.27272742986679077, 0)
-			end
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.UIGradient
+				Section["1f"] = Instance.new("UIGradient", Section["1e"])
+				Section["1f"]["Rotation"] = 90
+				Section["1f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(32, 32, 32)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(25, 25, 25))}
 
-			function Section:SetText(name)
-				Section["d"]["Text"] = name
-			end
-			
-			Library:ResizeCanvas(Tab["b"])
-			return Section
-		end
-		
-		-- TextButton
-		function Tab:Button(options)
-			options = Library:Place_Defaults({
-				Name = "Button",
-				Callback = function() end
-			}, options or {})
-			
-			local Button = {}
-			
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ButtonFrame
-				Button["14"] = Instance.new("Frame", Tab["b"])
-				Button["14"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Button["14"]["BackgroundTransparency"] = 1
-				Button["14"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Button["14"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-				Button["14"]["Position"] = UDim2.new(0.03596287593245506, 0, 0.10775861889123917, 0)
-				Button["14"]["Name"] = [[ButtonFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ButtonFrame.TextButton
-				Button["15"] = Instance.new("TextButton", Button["14"])
-				Button["15"]["TextSize"] = 14
-				Button["15"]["AutoButtonColor"] = false
-				Button["15"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Button["15"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Button["15"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Button["15"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Button["15"]["Text"] = "  "..options.Name
-				Button["15"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ButtonFrame.TextButton.UICorner
-				Button["16"] = Instance.new("UICorner", Button["15"])
-				Button["16"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ButtonFrame.TextButton.UIStroke
-				Button["17"] = Instance.new("UIStroke", Button["15"])
-				Button["17"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Button["17"]["Thickness"] = 0.699999988079071
-				Button["17"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionLabel
+				Section["20"] = Instance.new("TextLabel", Section["1e"])
+				Section["20"]["BorderSizePixel"] = 0
+				Section["20"]["TextXAlignment"] = Enum.TextXAlignment.Left
+				Section["20"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+				Section["20"]["TextSize"] = 12
+				Section["20"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+				Section["20"]["Size"] = UDim2.new(0, 408, 0, 18)
+				Section["20"]["Text"] = options.Name
+				Section["20"]["Name"] = [[SectionLabel]]
+				Section["20"]["Font"] = Enum.Font.GothamMedium
+				Section["20"]["BackgroundTransparency"] = 1
+				Section["20"]["Position"] = UDim2.new(0, 8, 0, 6)
 				
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ButtonFrame.ImageLabel
-				Button["18"] = Instance.new("ImageLabel", Button["14"])
-				Button["18"]["ZIndex"] = 2
-				Button["18"]["BorderSizePixel"] = 0
-				Button["18"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Button["18"]["Image"] = [[rbxassetid://11255462876]]
-				Button["18"]["Size"] = UDim2.new(0, 22, 0, 22)
-				Button["18"]["BackgroundTransparency"] = 1
-				Button["18"]["Position"] = UDim2.new(0.9249999523162842, 0, 0.13333334028720856, 0)
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer
+				Section["21"] = Instance.new("Frame", Section["1e"])
+				Section["21"]["BorderSizePixel"] = 0
+				Section["21"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+				Section["21"]["BackgroundTransparency"] = 1
+				Section["21"]["Size"] = UDim2.new(0, 458, 0, 425)
+				Section["21"]["Position"] = UDim2.new(0, 0, 0, 26)
+				Section["21"]["Name"] = [[SectionContainer]]
+
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.UIListLayout
+				Section["22"] = Instance.new("UIListLayout", Section["21"])
+				Section["22"]["Padding"] = UDim.new(0, 5)
+				Section["22"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.UIPadding
+				Section["23"] = Instance.new("UIPadding", Section["21"])
+				Section["23"]["PaddingLeft"] = UDim.new(0, 17)
+				
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.UICorner
+				Section["7a"] = Instance.new("UICorner", Section["1e"])
+				Section["7a"]["CornerRadius"] = UDim.new(0, 4)
+
+				-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.UIStroke
+				Section["7b"] = Instance.new("UIStroke", Section["1e"])
+				Section["7b"]["Color"] = Color3.fromRGB(43, 43, 43)
 			end
 			
-			Button["15"].MouseEnter:Connect(function()
-				Library:Tween(Button["15"], {
-					Length = 0.2,
-					Goal = {TextColor3 = Color3.fromRGB(136, 103, 177)}
-				})
+			function Section:Button(options)
+				options = Library:Place_Defaults({
+					Name = "Button",
+					Callback = function() return end
+				}, options or {})
 				
-				Library:Tween(Button["17"], {
-					Length = 0.2,
-					Goal = {Color = Color3.fromRGB(136, 103, 177)}
-				})
+				local Button = {
+					Hover = false
+				}
 				
-				Library:Tween(Button["18"], {
-					Length = 0.2,
-					Goal = {ImageColor3 = Color3.fromRGB(136, 103, 177)}
-				})
-			end)
-			
-			Button["15"].MouseLeave:Connect(function()
-				Library:Tween(Button["15"], {
-					Length = 0.2,
-					Goal = {TextColor3 = Color3.fromRGB(255, 255, 255)}
-				})
-				
-				Library:Tween(Button["17"], {
-					Length = 0.2,
-					Goal = {Color = Color3.fromRGB(59, 59, 59)}
-				})
-				
-				Library:Tween(Button["18"], {
-					Length = 0.2,
-					Goal = {ImageColor3 = Color3.fromRGB(255, 255, 255)}
-				})
-			end)
-			
-			Button["15"].MouseButton1Click:Connect(function()
-				task.spawn(function()
-					Library:Tween(Button["15"], {
-						Length = 0.1,
-						Goal = {BackgroundColor3 = Color3.fromRGB(16, 16, 16)}
-					})
-					
-					task.wait(0.1)
-					
-					Library:Tween(Button["15"], {
-						Length = 0.1,
-						Goal = {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}
-					})
-				end)
-				
-				options.Callback()
-			end)
-			
-			--Methods
-			function Button:SetText(text)
-				Button["15"]["Text"] = "  "..text
-			end
-			
-			Library:ResizeCanvas(Tab["b"])
-			return Button
-		end
-		
-		-- TextLabel
-		function Tab:TextLabel(options)
-			options = Library:Place_Defaults({
-				Name = "Label",
-				Color = Color3.new(1, 1, 1)
-			}, options or {})
+				do
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Button
+					Button["74"] = Instance.new("Frame", Section["21"])
+					Button["74"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Button["74"]["Size"] = UDim2.new(0, 423, 0, 34)
+					Button["74"]["Position"] = UDim2.new(0, 17, 0, 22)
+					Button["74"]["Name"] = [[Button]]
 
-			local TextLabel = {}
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Button.UICorner
+					Button["75"] = Instance.new("UICorner", Button["74"])
+					Button["75"]["CornerRadius"] = UDim.new(0, 4)
 
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.LabelFrame
-				TextLabel["10"] = Instance.new("Frame", Tab["b"])
-				TextLabel["10"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				TextLabel["10"]["BackgroundTransparency"] = 1
-				TextLabel["10"]["Size"] = UDim2.new(0, 400, 0, 30)
-				TextLabel["10"]["Name"] = [[LabelFrame]]
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Button.UIGradient
+					Button["76"] = Instance.new("UIGradient", Button["74"])
+					Button["76"]["Rotation"] = 270
+					Button["76"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
 
-				-- StarterGui.VisionLib.MainFrame.MainContainer.LabelFrame.TextLabel
-				TextLabel["11"] = Instance.new("TextLabel", TextLabel["10"])
-				TextLabel["11"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				TextLabel["11"]["BackgroundColor3"] = Color3.fromRGB(18, 18, 18)
-				TextLabel["11"]["TextSize"] = 14
-				TextLabel["11"]["TextColor3"] = options.Color
-				TextLabel["11"]["Size"] = UDim2.new(0, 400, 0, 30)
-				TextLabel["11"]["Text"] = "  "..options.Name
-				TextLabel["11"]["Font"] = Enum.Font.Gotham
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Button.Label
+					Button["77"] = Instance.new("TextLabel", Button["74"])
+					Button["77"]["BorderSizePixel"] = 0
+					Button["77"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					Button["77"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Button["77"]["TextSize"] = 13
+					Button["77"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Button["77"]["Size"] = UDim2.new(0, 301, 0, 33)
+					Button["77"]["Text"] = options.Name
+					Button["77"]["Name"] = [[Label]]
+					Button["77"]["Font"] = Enum.Font.GothamMedium
+					Button["77"]["BackgroundTransparency"] = 1
+					Button["77"]["Position"] = UDim2.new(0, 21, 0, 0)
 
-				-- StarterGui.VisionLib.MainFrame.MainContainer.LabelFrame.TextLabel.UICorner
-				TextLabel["12"] = Instance.new("UICorner", TextLabel["11"])
-				TextLabel["12"]["CornerRadius"] = UDim.new(0, 6)
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Button.UIStroke
+					Button["78"] = Instance.new("UIStroke", Button["74"])
+					Button["78"]["Color"] = Color3.fromRGB(43, 43, 43)
 
-				-- StarterGui.VisionLib.MainFrame.MainContainer.LabelFrame.TextLabel.UIStroke
-				TextLabel["13"] = Instance.new("UIStroke", TextLabel["11"])
-				TextLabel["13"]["Color"] = options.Color
-				TextLabel["13"]["Thickness"] = 0.699999988079071
-				TextLabel["13"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-			end
-			
-			function TextLabel:SetText(name)
-				TextLabel["11"]["Text"] = "  "..name
-			end
-			
-			function TextLabel:SetColor(color)
-				TextLabel["11"]["TextColor3"] = color
-				TextLabel["13"]["Color"] = color
-			end
-			
-			Library:ResizeCanvas(Tab["b"])
-			return TextLabel
-		end
-		
-		-- Toggle
-		function Tab:Toggle(options)
-			options = Library:Place_Defaults({
-				Name = "Toggle",
-				Default = false,
-				Callback = function() return end,
-			}, options or {})
-			
-			local Toggle = {
-				Bool = options.Default
-			}
-			
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ToggleFrame
-				Toggle["19"] = Instance.new("Frame", Tab["b"])
-				Toggle["19"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Toggle["19"]["BackgroundTransparency"] = 1
-				Toggle["19"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Toggle["19"]["Name"] = [[ToggleFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ToggleFrame.TextButton
-				Toggle["1a"] = Instance.new("TextButton", Toggle["19"])
-				Toggle["1a"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Toggle["1a"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Toggle["1a"]["TextSize"] = 14
-				Toggle["1a"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Toggle["1a"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Toggle["1a"]["Text"] = "  "..options.Name
-				Toggle["1a"]["Font"] = Enum.Font.Gotham
-				Toggle["1a"]["AutoButtonColor"] = false
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ToggleFrame.TextButton.UICorner
-				Toggle["1b"] = Instance.new("UICorner", Toggle["1a"])
-				Toggle["1b"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ToggleFrame.TextButton.UIStroke
-				Toggle["1c"] = Instance.new("UIStroke", Toggle["1a"])
-				Toggle["1c"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Toggle["1c"]["Thickness"] = 0.699999988079071
-				Toggle["1c"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ToggleFrame.ImageButton
-				Toggle["1d"] = Instance.new("ImageButton", Toggle["19"])
-				Toggle["1d"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Toggle["1d"]["Image"] = [[rbxassetid://10710517738]]
-				Toggle["1d"]["Size"] = UDim2.new(0, 25, 0, 25)
-				Toggle["1d"]["Position"] = UDim2.new(0.9225000143051147, 0, 0.06666667014360428, 0)
-				Toggle["1d"]["AutoButtonColor"] = false
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ToggleFrame.ImageButton.UICorner
-				Toggle["1e"] = Instance.new("UICorner", Toggle["1d"])
-				Toggle["1e"]["CornerRadius"] = UDim.new(0, 6)
-			end
-			
-			Toggle["1a"].MouseEnter:Connect(function()
-				Library:Tween(Toggle["1a"], {
-					Length = 0.2,
-					Goal = {TextColor3 = Color3.fromRGB(136, 103, 177)}
-				})
-
-				Library:Tween(Toggle["1c"], {
-					Length = 0.2,
-					Goal = {Color = Color3.fromRGB(136, 103, 177)}
-				})
-			end)
-
-			Toggle["1a"].MouseLeave:Connect(function()
-				Library:Tween(Toggle["1a"], {
-					Length = 0.2,
-					Goal = {TextColor3 = Color3.fromRGB(255, 255, 255)}
-				})
-
-				Library:Tween(Toggle["1c"], {
-					Length = 0.2,
-					Goal = {Color = Color3.fromRGB(59, 59, 59)}
-				})
-			end)
-			
-			Toggle["1a"].MouseButton1Click:Connect(function()
-				task.spawn(function()
-					Library:Tween(Toggle["1a"], {
-						Length = 0.1,
-						Goal = {BackgroundColor3 = Color3.fromRGB(16, 16, 16)}
-					})
-
-					task.wait(0.1)
-
-					Library:Tween(Toggle["1a"], {
-						Length = 0.1,
-						Goal = {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}
-					})
-				end)
-				
-				if Toggle.Bool then
-					Toggle.Bool = false
-					
-					Library:Tween(Toggle["1d"], {
-						Length = 0.4,
-						Goal = {BackgroundColor3 = Color3.fromRGB(15, 15, 15)}
-					})
-				else
-					Toggle.Bool = true
-					
-					Library:Tween(Toggle["1d"], {
-						Length = 0.4,
-						Goal = {BackgroundColor3 = Color3.fromRGB(136, 103, 177)}
-					})
-				end
-
-				options.Callback(Toggle.Bool)
-			end)
-			
-			do
-				if Toggle.Bool then
-					options.Callback(Toggle.Bool)
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Button.ImageLabel
+					Button["79"] = Instance.new("ImageLabel", Button["74"])
+					Button["79"]["BorderSizePixel"] = 0
+					Button["79"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Button["79"]["Image"] = [[rbxassetid://11400928498]]
+					Button["79"]["Size"] = UDim2.new(0, 21, 0, 21)
+					Button["79"]["BackgroundTransparency"] = 1
+					Button["79"]["Position"] = UDim2.new(0.9219858050346375, 0, 0.1764705926179886, 0)
 				end
 				
-				if Toggle.Bool then
-					Library:Tween(Toggle["1d"], {
-						Length = 0.1,
-						Goal = {BackgroundColor3 = Color3.fromRGB(136, 103, 177)}
-					})
-				else
-					Library:Tween(Toggle["1d"], {
-						Length = 0.1,
-						Goal = {BackgroundColor3 = Color3.fromRGB(15, 15, 15)}
-					})
-				end
-			end
-			
-			function Toggle:SetText(name)
-				Toggle["1a"]["Text"] = "  "..name
-			end
-			
-			Library:ResizeCanvas(Tab["b"])
-			return Toggle
-		end
-		
-		-- Slider
-		function Tab:Slider(options)
-			options = Library:Place_Defaults({
-				Name = "Slider",
-				Min = 0,
-				Max = 100,
-				Default = 1,
-				Callback = function() end
-			}, options or {})
-
-			local Slider = {
-				Hover = false,
-				OldVal = options.Default
-			}
-
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame
-				Slider["23"] = Instance.new("Frame", Tab["b"])
-				Slider["23"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Slider["23"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Slider["23"]["Name"] = [[SliderFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.UICorner
-				Slider["24"] = Instance.new("UICorner", Slider["23"])
-				Slider["24"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.UIStroke
-				Slider["25"] = Instance.new("UIStroke", Slider["23"])
-				Slider["25"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Slider["25"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.TextLabel
-				Slider["26"] = Instance.new("TextLabel", Slider["23"])
-				Slider["26"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Slider["26"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Slider["26"]["TextSize"] = 14
-				Slider["26"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Slider["26"]["Size"] = UDim2.new(0, 400, 0, 10)
-				Slider["26"]["Text"] = "  "..options.Name
-				Slider["26"]["Font"] = Enum.Font.Gotham
-				Slider["26"]["BackgroundTransparency"] = 1
-				Slider["26"]["Position"] = UDim2.new(0, 0, 0.20000000298023224, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.SliderBackgorund
-				Slider["27"] = Instance.new("Frame", Slider["23"])
-				Slider["27"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Slider["27"]["Size"] = UDim2.new(0, 380, 0, 8)
-				Slider["27"]["Position"] = UDim2.new(0.02500000037252903, 0, 0.6666666865348816, 0)
-				Slider["27"]["Name"] = [[SliderBackgorund]]
-				Slider["27"]["ClipsDescendants"] = true
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.SliderBackgorund.UICorner
-				Slider["28"] = Instance.new("UICorner", Slider["27"])
-				Slider["28"]["CornerRadius"] = UDim.new(1, 8)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.SliderBackgorund.Slider
-				Slider["29"] = Instance.new("Frame", Slider["27"])
-				Slider["29"]["ZIndex"] = 4
-				Slider["29"]["BackgroundColor3"] = Color3.fromRGB(71, 71, 71)
-				Slider["29"]["Size"] = UDim2.new(0, 221, 0, 8)
-				Slider["29"]["Name"] = [[Slider]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.SliderBackgorund.Slider.UICorner
-				Slider["2a"] = Instance.new("UICorner", Slider["29"])
-				Slider["2a"]["CornerRadius"] = UDim.new(1, 8)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.TextBox
-				Slider["2b"] = Instance.new("TextBox", Slider["23"])
-				Slider["2b"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Slider["2b"]["TextWrapped"] = true
-				Slider["2b"]["TextSize"] = 11
-				Slider["2b"]["TextScaled"] = false
-				Slider["2b"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Slider["2b"]["Size"] = UDim2.new(0, 45, 0, 15)
-				Slider["2b"]["Text"] = options.Default
-				Slider["2b"]["Position"] = UDim2.new(0.8725000023841858, 0, 0.10000000149011612, 0)
-				Slider["2b"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.SliderFrame.TextBox.UICorner
-				Slider["2c"] = Instance.new("UICorner", Slider["2b"])
-				Slider["2c"]["CornerRadius"] = UDim.new(0, 4)
-			end
-			
-			-- Methods
-			function Slider:SetValue(Value)
-				Value = math.floor(Value)
-				
-				Library:Tween(Slider["29"], {
-					Length = 1,
-					Goal = {Size = UDim2.fromScale(((Value - options.Min) / (options.Max - options.Min)), 1)}
-				})
-				
-				Slider["2b"]["Text"] = Value
-				Slider.OldVal = Value
-				options.Callback(Value)
-			end
-			
-			function Slider:SetText(name)
-				Slider["26"]["Name"] = "  "..name
-			end
-			
-			do
-				local MouseDown
-				
-				Slider["23"].MouseEnter:Connect(function()
-					Slider.Hover = true
-					
-					Library:Tween(Slider["29"], {
-						Length = 0.5,
-						Goal = {BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)}
-					})
-				end)
-				
-				Slider["23"].MouseLeave:Connect(function()
-					Slider.Hover = false
-					
-					Library:Tween(Slider["29"], {
-						Length = 0.5,
-						Goal = {BackgroundColor3 = Color3.new(0.27451, 0.27451, 0.27451)}
-					})
-				end)
-				
-				Slider["2b"].Focused:Connect(function()
-					Slider["2b"].Text = ""
-				end)
-				
-				Slider["2b"].FocusLost:Connect(function()
-					local success = pcall(function()
-						local NumVal = tonumber(Slider["2b"].Text)
-						if NumVal <= options.Max and NumVal >= options.Min then
-							Slider.OldVal = NumVal
-							Slider:SetValue(NumVal)
-						else
-							Slider["2b"].Text = Slider.OldVal
-						end
+				-- Handler
+				do
+					Button["74"].MouseEnter:Connect(function()
+						Library:Tween(Button["78"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(65, 65, 65)}
+						})
+						
+						Button.Hover = true
 					end)
 					
-					if not success then
-						Slider["2b"].Text = Slider.OldVal
+					Button["74"].MouseLeave:Connect(function()
+						Library:Tween(Button["78"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(43, 43, 43)}
+						})
+						
+						Button.Hover = false
+					end)
+					
+					UserInputService.InputBegan:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.MouseButton1 and Button.Hover then
+							Library:Tween(Button["78"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(86, 86, 86)}
+							})
+							
+							Library:Tween(Button["79"], {
+								Length = 0.2,
+								Goal = {ImageColor3 = Color3.fromRGB(105, 53, 189)}
+							})
+							
+							-- Callback
+							do
+								task.spawn(function()
+									options.Callback()
+								end)
+							end
+							
+							task.wait(0.2)
+							Library:Tween(Button["79"], {
+								Length = 0.2,
+								Goal = {ImageColor3 = Color3.fromRGB(255, 255, 255)}
+							})
+							
+							if Button.Hover then
+								Library:Tween(Button["78"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(65, 65, 65)}
+								})
+							else
+								Library:Tween(Button["78"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(43, 43, 43)}
+								})
+							end
+						end
+					end)
+				end
+				
+				-- Methods
+				do
+					function Button:SetName(name)
+						Button["77"]["Text"] = name
 					end
+				end
+				
+				task.spawn(function()
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
 				end)
 				
-				UserInputService.InputBegan:Connect(function(key)
-					if key.UserInputType == Enum.UserInputType.MouseButton1 and Slider.Hover then
-						Library.Sliding = true
-						MouseDown = true
+				return Button
+			end
+			
+			function Section:Toggle(options)
+				options = Library:Place_Defaults({
+					Name = "Toggle",
+					Default = false,
+					Callback = function() return end
+				}, options or {})
+
+				local Toggle = {
+					Hover = false,
+					Bool = options.Default
+				}
+
+				do
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle
+					Toggle["24"] = Instance.new("Frame", Section["21"])
+					Toggle["24"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Toggle["24"]["Size"] = UDim2.new(0, 423, 0, 34)
+					Toggle["24"]["Position"] = UDim2.new(0, 17, 0, 22)
+					Toggle["24"]["Name"] = [[Toggle]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.UICorner
+					Toggle["25"] = Instance.new("UICorner", Toggle["24"])
+					Toggle["25"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.UIGradient
+					Toggle["26"] = Instance.new("UIGradient", Toggle["24"])
+					Toggle["26"]["Rotation"] = 270
+					Toggle["26"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.Toggle
+					Toggle["27"] = Instance.new("TextButton", Toggle["24"])
+					Toggle["27"]["BorderSizePixel"] = 0
+					Toggle["27"]["AutoButtonColor"] = false
+					Toggle["27"]["TextSize"] = 14
+					Toggle["27"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Toggle["27"]["TextColor3"] = Color3.fromRGB(0, 0, 0)
+					Toggle["27"]["Size"] = UDim2.new(0, 38, 0, 18)
+					Toggle["27"]["Name"] = [[Toggle]]
+					Toggle["27"]["Text"] = [[]]
+					Toggle["27"]["Font"] = Enum.Font.SourceSans
+					Toggle["27"]["Position"] = UDim2.new(0, 373, 0, 8)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.Toggle.UICorner
+					Toggle["28"] = Instance.new("UICorner", Toggle["27"])
+					Toggle["28"]["CornerRadius"] = UDim.new(2, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.Toggle.UIGradient
+					Toggle["29"] = Instance.new("UIGradient", Toggle["27"])
+					Toggle["29"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(75, 75, 75)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(99, 99, 99))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.Toggle.Indicator
+					Toggle["2a"] = Instance.new("TextLabel", Toggle["27"])
+					Toggle["2a"]["BackgroundColor3"] = Color3.fromRGB(177, 177, 177)
+					Toggle["2a"]["TextSize"] = 14
+					Toggle["2a"]["TextColor3"] = Color3.fromRGB(0, 0, 0)
+					Toggle["2a"]["Size"] = UDim2.new(0, 23, 0, 20)
+					Toggle["2a"]["Text"] = [[]]
+					Toggle["2a"]["Name"] = [[Indicator]]
+					Toggle["2a"]["Font"] = Enum.Font.SourceSans
+					Toggle["2a"]["Position"] = UDim2.new(0, 0,0, -1)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.Toggle.Indicator.UICorner
+					Toggle["2b"] = Instance.new("UICorner", Toggle["2a"])
+					Toggle["2b"]["CornerRadius"] = UDim.new(1, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.Label
+					Toggle["2d"] = Instance.new("TextLabel", Toggle["24"])
+					Toggle["2d"]["BorderSizePixel"] = 0
+					Toggle["2d"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					Toggle["2d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Toggle["2d"]["TextSize"] = 13
+					Toggle["2d"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Toggle["2d"]["Size"] = UDim2.new(0, 301, 0, 33)
+					Toggle["2d"]["Text"] = options.Name
+					Toggle["2d"]["Name"] = [[Label]]
+					Toggle["2d"]["Font"] = Enum.Font.GothamMedium
+					Toggle["2d"]["BackgroundTransparency"] = 1
+					Toggle["2d"]["Position"] = UDim2.new(0, 21, 0, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Toggle.UIStroke
+					Toggle["2e"] = Instance.new("UIStroke", Toggle["24"])
+					Toggle["2e"]["Color"] = Color3.fromRGB(43, 43, 43)
+				end
+
+				-- Handler
+				do
+					Toggle["24"].MouseEnter:Connect(function()
+						Library:Tween(Toggle["2e"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(65, 65, 65)}
+						})
+
+						Toggle.Hover = true
+					end)
+
+					Toggle["24"].MouseLeave:Connect(function()
+						Library:Tween(Toggle["2e"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(43, 43, 43)}
+						})
+
+						Toggle.Hover = false
+					end)
+
+					UserInputService.InputBegan:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.MouseButton1 and Toggle.Hover then
+							Library:Tween(Toggle["2e"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(86, 86, 86)}
+							})
+							
+							Toggle:Set()
+							task.wait(0.2)
+							if Toggle.Hover then
+								Library:Tween(Toggle["2e"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(65, 65, 65)}
+								})
+							else
+								Library:Tween(Toggle["2e"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(43, 43, 43)}
+								})
+							end
+						end
+					end)
+				end
+
+				-- Methods
+				do
+					function Toggle:Toggle(toggle)
+						if toggle then
+							Toggle.Bool = true
+							
+							task.spawn(function()
+								Library:Tween(Toggle["2a"], {
+									Length = 0.2,
+									Goal = {Position = UDim2.new(0, 15,0, -1)}
+								})
+								
+								Library:Tween(Toggle["2a"], {
+									Length = 0.2,
+									Goal = {BackgroundColor3 = Color3.fromRGB(105, 53, 189)}
+								})
+							end)
+							
+						else
+							Toggle.Bool = false
+							
+							task.spawn(function()
+								Library:Tween(Toggle["2a"], {
+									Length = 0.2,
+									Goal = {Position = UDim2.new(0, 0,0, -1)}
+								})
+								
+								
+								Library:Tween(Toggle["2a"], {
+									Length = 0.2,
+									Goal = {BackgroundColor3 = Color3.fromRGB(177, 177, 177)}
+								})
+							end)
+						end
 						
 						task.spawn(function()
-							Library:Tween(Slider["29"], {
-								Length = 0.5,
-								Goal = {BackgroundColor3 = Color3.new(0.780392, 0.780392, 0.780392)}
-							})
+							options.Callback(Toggle.Bool)
 						end)
+					end
 					
-						while RunService.RenderStepped:wait() and MouseDown do
-							local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
-							local value = ((options.Max - options.Min) * percentage) + options.Min
-							value = math.floor(value)
-							Slider.OldVal = value
-							Slider["2b"].Text = value
+					function Toggle:Set(bool)
+						if type(bool) == "boolean" then
+							Toggle:Toggle(bool)
+						else
+							if Toggle.Bool then
+								Toggle:Toggle(false)
+							else
+								Toggle:Toggle(true)
+							end
+						end
+					end
+					
+					function Toggle:SetName(name)
+						Toggle["2d"]["Text"] = name
+					end
+				end
+				
+				Toggle:Set(options.Default)
+				
+				task.spawn(function()
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
+				end)
 
-							if value ~= Slider.OldVal then
-								options.Callback(value)
+				return Toggle
+			end
+			
+			function Section:Slider(options)
+				options = Library:Place_Defaults({
+					Name = "Slider",
+					Max = 100,
+					Min = 0,
+					Default = 50,
+					Callback = function() return end
+				}, options or {})
+
+				local Slider = {
+					Hover = false,
+					OldVal = options.Default,
+					TextboxHover = false
+				}
+
+				do
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider
+					Slider["36"] = Instance.new("Frame", Section["21"])
+					Slider["36"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Slider["36"]["Size"] = UDim2.new(0, 423, 0, 34)
+					Slider["36"]["Position"] = UDim2.new(0, 17, 0, 104)
+					Slider["36"]["Name"] = [[Slider]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.UICorner
+					Slider["37"] = Instance.new("UICorner", Slider["36"])
+					Slider["37"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.UIGradient
+					Slider["38"] = Instance.new("UIGradient", Slider["36"])
+					Slider["38"]["Rotation"] = 270
+					Slider["38"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Label
+					Slider["39"] = Instance.new("TextLabel", Slider["36"])
+					Slider["39"]["BorderSizePixel"] = 0
+					Slider["39"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					Slider["39"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Slider["39"]["TextSize"] = 13
+					Slider["39"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Slider["39"]["Size"] = UDim2.new(0, 301, 0, 33)
+					Slider["39"]["Text"] = options.Name
+					Slider["39"]["Name"] = [[Label]]
+					Slider["39"]["Font"] = Enum.Font.GothamMedium
+					Slider["39"]["BackgroundTransparency"] = 1
+					Slider["39"]["Position"] = UDim2.new(0, 21, 0, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Slider
+					Slider["3a"] = Instance.new("Frame", Slider["36"])
+					Slider["3a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Slider["3a"]["Size"] = UDim2.new(0, 136, 0, 10)
+					Slider["3a"]["Position"] = UDim2.new(0, 229, 0, 12)
+					Slider["3a"]["Name"] = [[Slider]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Slider.UICorner
+					Slider["3b"] = Instance.new("UICorner", Slider["3a"])
+					Slider["3b"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Slider.Sliderbackground
+					Slider["3c"] = Instance.new("Frame", Slider["3a"])
+					Slider["3c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Slider["3c"]["Size"] = UDim2.new(0.49264705181121826, 0, 0.9444444179534912, 0)
+					Slider["3c"]["Name"] = [[Sliderbackground]]
+					Slider["3c"]["BorderSizePixel"] = 0
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Slider.Sliderbackground.UICorner
+					Slider["3d"] = Instance.new("UICorner", Slider["3c"])
+					Slider["3d"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Slider.Sliderbackground.ThemeColorGradient
+					Slider["3e"] = Instance.new("UIGradient", Slider["3c"])
+					Slider["3e"]["Name"] = [[ThemeColorGradient]]
+					Slider["3e"]["Rotation"] = 90
+					Slider["3e"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.Slider.UIGradient
+					Slider["3f"] = Instance.new("UIGradient", Slider["3a"])
+					Slider["3f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(75, 75, 75)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(99, 99, 99))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.UIStroke
+					Slider["40"] = Instance.new("UIStroke", Slider["36"])
+					Slider["40"]["Color"] = Color3.fromRGB(43, 43, 43)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Slider.TextBox
+					Slider["3g"] = Instance.new("TextBox", Slider["36"])
+					Slider["3g"]["CursorPosition"] = -1
+					Slider["3g"]["PlaceholderColor3"] = Color3.fromRGB(127, 127, 127)
+					Slider["3g"]["RichText"] = true
+					Slider["3g"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Slider["3g"]["TextSize"] = 11
+					Slider["3g"]["BackgroundColor3"] = Color3.fromRGB(51, 51, 51)
+					Slider["3g"]["PlaceholderText"] = [[]]
+					Slider["3g"]["Size"] = UDim2.new(0, 45, 0, 18)
+					Slider["3g"]["Text"] = [[]]
+					Slider["3g"]["Position"] = UDim2.new(0, 373, 0, 6)
+					Slider["3g"]["Font"] = Enum.Font.Gotham
+					Slider["3g"]["BorderSizePixel"] = 0
+				end
+
+				-- Handler
+				do
+					local MouseDown
+					
+					Slider["36"].MouseEnter:Connect(function()
+						Slider.Hover = true
+						
+						Library:Tween(Slider["40"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(65, 65, 65)}
+						})
+					end)
+					
+					Slider["36"].MouseLeave:Connect(function()
+						Slider.Hover = false
+						
+						Library:Tween(Slider["40"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(43, 43, 43)}
+						})
+					end)
+					
+					Slider["3g"].MouseEnter:Connect(function()
+						Slider.TextboxHover = true
+					end)
+					
+					Slider["3g"].MouseLeave:Connect(function()
+						Slider.TextboxHover = false
+					end)
+
+					Slider["3g"].Focused:Connect(function()
+						Slider["3g"]["Text"] = [[]]
+						
+						Library.Sliding = true
+					end)
+
+					Slider["3g"].FocusLost:Connect(function()
+						local success = pcall(function()
+							local NumVal = tonumber(Slider["3g"].Text)
+							if NumVal <= options.Max and NumVal >= options.Min then
+								Slider.OldVal = NumVal
+								Slider:SetValue(NumVal)
+							else
+								Slider["3g"].Text = Slider.OldVal
+							end
+						end)
+
+						if not success then
+							Slider["3g"].Text = Slider.OldVal
+						end
+						
+						Library.Sliding = false
+					end)
+
+					UserInputService.InputBegan:connect(function(key)
+						if key.UserInputType == Enum.UserInputType.MouseButton1 and Slider.Hover and not Slider.TextboxHover then
+							Library.Sliding = true
+							MouseDown = true
+
+							while RunService.RenderStepped:wait() and MouseDown do
+								local percentage = math.clamp((Mouse.X - Slider["3a"].AbsolutePosition.X) / (Slider["3a"].AbsoluteSize.X), 0, 1)
+								local Value = ((options.Max - options.Min) * percentage) + options.Min
+								Value = math.floor(Value)
+								
+								if Value ~= Slider.OldVal then
+									options.Callback(Value)
+								end
+								Slider.OldVal = Value
+								Slider["3g"]["Text"] = Value
+								
+								Library:Tween(Slider["3c"], {
+									Length = 0.06,
+									Goal = {Size = UDim2.fromScale(((Value - options.Min) / (options.Max - options.Min)), 1)}
+								})
+								Library.Sliding = true
 							end
 
-							Library:Tween(Slider["29"], {
-								Length = 0.06,
-								Goal = {Size = UDim2.fromScale(percentage, 1)}
-							})
+							Library.Sliding = false
 						end
+					end)
+
+					UserInputService.InputEnded:connect(function(key)
+						if key.UserInputType == Enum.UserInputType.MouseButton1 then
+							MouseDown = false
+						end
+					end)
+				end
+
+				-- Methods
+				do
+					function Slider:SetValue(Value)
+						Value = math.floor(Value)
+
+						Library:Tween(Slider["3c"], {
+							Length = 1,
+							Goal = {Size = UDim2.fromScale(((Value - options.Min) / (options.Max - options.Min)), 1)}
+						})
+
+						Slider["3g"]["Text"] = Value
+						Slider.OldVal = Value
+						options.Callback(Value)
+					end
+
+					function Slider:SetName(name)
+						Slider["39"]["Text"] = name
+					end
+				end
+
+				task.spawn(function()
+					Slider:SetValue(options.Default)
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
+				end)
+
+				return Slider
+			end
+			
+			function Section:Keybind(options)
+				options = Library:Place_Defaults({
+					Name = "Keybind",
+					Default = Enum.KeyCode.Return,
+					Callback = function() return end,
+					UpdateKeyCallback = function() return end
+				}, options or {})
+
+				local Keybind = {
+					Focused = false,
+					Keybind = options.Default
+				}
+
+				do
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind
+					Keybind["59"] = Instance.new("Frame", Section["21"])
+					Keybind["59"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Keybind["59"]["Size"] = UDim2.new(0, 423, 0, 34)
+					Keybind["59"]["Position"] = UDim2.new(0, 17, 0, 104)
+					Keybind["59"]["Name"] = [[Keybind]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.UICorner
+					Keybind["5a"] = Instance.new("UICorner", Keybind["59"])
+					Keybind["5a"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.UIGradient
+					Keybind["5b"] = Instance.new("UIGradient", Keybind["59"])
+					Keybind["5b"]["Rotation"] = 270
+					Keybind["5b"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.Label
+					Keybind["5c"] = Instance.new("TextLabel", Keybind["59"])
+					Keybind["5c"]["BorderSizePixel"] = 0
+					Keybind["5c"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					Keybind["5c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Keybind["5c"]["TextSize"] = 13
+					Keybind["5c"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Keybind["5c"]["Size"] = UDim2.new(0, 301, 0, 33)
+					Keybind["5c"]["Text"] = options.Name
+					Keybind["5c"]["Name"] = [[Label]]
+					Keybind["5c"]["Font"] = Enum.Font.GothamMedium
+					Keybind["5c"]["BackgroundTransparency"] = 1
+					Keybind["5c"]["Position"] = UDim2.new(0, 21, 0, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.TextButton
+					Keybind["5d"] = Instance.new("TextButton", Keybind["59"])
+					Keybind["5d"]["AutoButtonColor"] = false
+					Keybind["5d"]["TextSize"] = 11
+					Keybind["5d"]["BackgroundColor3"] = Color3.fromRGB(195, 195, 195)
+					Keybind["5d"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Keybind["5d"]["Size"] = UDim2.new(0, 80, 0, 21)
+					Keybind["5d"]["Text"] = [[]]
+					Keybind["5d"]["Font"] = Enum.Font.Gotham
+					Keybind["5d"]["Position"] = UDim2.new(0.7900000214576721, 0, 0.17599999904632568, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.TextButton.UICorner
+					Keybind["5e"] = Instance.new("UICorner", Keybind["5d"])
+					Keybind["5e"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.TextButton.UIGradient
+					Keybind["5f"] = Instance.new("UIGradient", Keybind["5d"])
+					Keybind["5f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(75, 75, 75)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(99, 99, 99))}
+					
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.UIStroke
+					Keybind["5g"] = Instance.new("UIStroke", Keybind["59"])
+					Keybind["5g"]["Color"] = Color3.fromRGB(43, 43, 43)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Keybind.TextButton.TextLabel
+					Keybind["60"] = Instance.new("TextLabel", Keybind["5d"])
+					Keybind["60"]["BorderSizePixel"] = 0
+					Keybind["60"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Keybind["60"]["TextSize"] = 10
+					Keybind["60"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Keybind["60"]["Size"] = UDim2.new(0, 79, 0, 21)
+					Keybind["60"]["Text"] = [[LeftShift]]
+					Keybind["60"]["Font"] = Enum.Font.Gotham
+					Keybind["60"]["BackgroundTransparency"] = 1
+
+					local keybindText = string.gsub(tostring(Keybind.Keybind), "Enum.KeyCode.", "")
+
+					Keybind["60"]["Text"] = keybindText
+				end
+
+				-- Methods
+				do
+					Keybind["59"].MouseEnter:Connect(function()
+						Library:Tween(Keybind["5g"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(65, 65, 65)}
+						})
+					end)
+					
+					
+
+					Keybind["59"].MouseLeave:Connect(function()
+						Library:Tween(Keybind["5g"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(43, 43, 43)}
+						})
+					end)
+
+					Keybind["5d"].MouseButton1Click:Connect(function()
+						Keybind.Focused = true
+
+						Keybind["60"]["Text"] = "..."
+					end)
+
+					UserInputService.InputBegan:Connect(function(input, GameProcess)
+						if input.UserInputType == Enum.UserInputType.Keyboard then
+							if input.KeyCode == Keybind.Keybind then
+								pcall(function()
+									options.Callback()
+								end)
+							end
+
+							if Keybind.Focused then
+								Keybind.Keybind = input.KeyCode
+								local keybindText = string.gsub(tostring(Keybind.Keybind), "Enum.KeyCode.", "")
+								Keybind["60"]["Text"] = keybindText
+								pcall(function()
+									options.UpdateKeyCallback(input.KeyCode)
+								end)
+
+								Keybind.Focused = false
+							end
+						end
+					end)
+
+					function Keybind:SetName(name)
+						Keybind["5c"]["Text"] = name
+					end
+				end
+
+				task.spawn(function()
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
+				end)
+				
+				return Keybind
+			end
+			
+			function Section:SmallTextbox(options)
+				options = Library:Place_Defaults({
+					Name = "Small Textbox",
+					Default = "Text",
+					Callback = function() return end
+				}, options or {})
+
+				local Textbox = {
+					Hover = false
+				}
+
+				do
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1
+					Textbox["2e"] = Instance.new("Frame", Section["21"])
+					Textbox["2e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Textbox["2e"]["Size"] = UDim2.new(0, 423, 0, 34)
+					Textbox["2e"]["Position"] = UDim2.new(0, 17, 0, 104)
+					Textbox["2e"]["Name"] = [[Textbox1]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.UICorner
+					Textbox["2f"] = Instance.new("UICorner", Textbox["2e"])
+					Textbox["2f"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.UIGradient
+					Textbox["30"] = Instance.new("UIGradient", Textbox["2e"])
+					Textbox["30"]["Rotation"] = 270
+					Textbox["30"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.Label
+					Textbox["31"] = Instance.new("TextLabel", Textbox["2e"])
+					Textbox["31"]["BorderSizePixel"] = 0
+					Textbox["31"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					Textbox["31"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Textbox["31"]["TextSize"] = 13
+					Textbox["31"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Textbox["31"]["Size"] = UDim2.new(0, 301, 0, 33)
+					Textbox["31"]["Text"] = options.Name
+					Textbox["31"]["Name"] = [[Label]]
+					Textbox["31"]["Font"] = Enum.Font.GothamMedium
+					Textbox["31"]["BackgroundTransparency"] = 1
+					Textbox["31"]["Position"] = UDim2.new(0, 21, 0, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.UIStroke
+					Textbox["32"] = Instance.new("UIStroke", Textbox["2e"])
+					Textbox["32"]["Color"] = Color3.fromRGB(43, 43, 43)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.Frame
+					Textbox["33"] = Instance.new("Frame", Textbox["2e"])
+					Textbox["33"]["BorderSizePixel"] = 0
+					Textbox["33"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Textbox["33"]["BackgroundTransparency"] = 1
+					Textbox["33"]["Size"] = UDim2.new(0.9810874462127686, 0, 1, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.Frame.TextBox
+					Textbox["34"] = Instance.new("TextBox", Textbox["33"])
+					Textbox["34"]["PlaceholderColor3"] = Color3.fromRGB(127, 127, 127)
+					Textbox["34"]["RichText"] = true
+					Textbox["34"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Textbox["34"]["TextSize"] = 11
+					Textbox["34"]["BackgroundColor3"] = Color3.fromRGB(51, 51, 51)
+					Textbox["34"]["Size"] = UDim2.new(0, 92, 0, 21)
+					Textbox["34"]["Text"] = [[]]
+					Textbox["34"]["Position"] = UDim2.new(0.7612293362617493, 0, 0.1764705926179886, 0)
+					Textbox["34"]["Font"] = Enum.Font.Gotham
+					Textbox["34"]["TextWrapped"] = false
+					Textbox["34"]["PlaceholderText"] = [[...]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.Frame.TextBox.UICorner
+					Textbox["35"] = Instance.new("UICorner", Textbox["34"])
+					Textbox["35"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.Frame.TextBox.UIGradient
+					Textbox["36"] = Instance.new("UIGradient", Textbox["34"])
+					Textbox["36"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(75, 75, 75)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(99, 99, 99))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Textbox1.Frame.UIListLayout
+					Textbox["37"] = Instance.new("UIListLayout", Textbox["33"])
+					Textbox["37"]["VerticalAlignment"] = Enum.VerticalAlignment.Center
+					Textbox["37"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Right
+					Textbox["37"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+				end
+
+				-- Handler
+				do			
+					Textbox["2e"].MouseEnter:Connect(function()
+						Library:Tween(Textbox["32"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(65, 65, 65)}
+						})
+					end)
+
+					Textbox["2e"].MouseLeave:Connect(function()
+						Library:Tween(Textbox["32"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(43, 43, 43)}
+						})
+					end)
+					
+
+					Textbox["34"].Focused:Connect(function()						
+						Textbox["34"].Text = ""
+						
+						Library.Sliding = true
+					end)
+					
+					Textbox["34"].FocusLost:Connect(function()						
 						Library.Sliding = false
 						
 						task.spawn(function()
-							if Slider.Hover then
-								Library:Tween(Slider["29"], {
-									Length = 0.5,
-									Goal = {BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)}
+							options.Callback(Textbox["34"].Text)
+						end)
+					end)
+					
+					Textbox["34"]:GetPropertyChangedSignal("Text"):Connect(function()
+						if Textbox["34"].Text == "" then
+							Library:Tween(Textbox["34"], {
+								Length = 0.2,
+								Goal = {Size = UDim2.new(0, 35, 0, 21)}
+							})
+						else
+							local Bound = TextService:GetTextSize(Textbox["34"].Text, Textbox["34"].TextSize, Textbox["34"].Font, Vector2.new(Textbox["34"].AbsoluteSize.X,Textbox["34"].AbsoluteSize.Y))
+
+							Library:Tween(Textbox["34"], {
+								Length = 0.2,
+								Goal = {Size = UDim2.new(0, (Bound.X + 18), 0, 21)}
+							})
+						end
+					end)
+				end
+
+				-- Methods
+				do
+					function Textbox:SetText(Text)
+						Textbox["34"].Text = Text
+					end
+					
+					function Textbox:SetName(Name)
+						Textbox["31"].Text = Name
+					end
+				end
+				
+				Textbox:SetText(options.Default)
+				
+				do
+					if Textbox["34"].Text == "" then
+						Library:Tween(Textbox["34"], {
+							Length = 0.2,
+							Goal = {Size = UDim2.new(0, 35, 0, 21)}
+						})
+					else
+						local Bound = TextService:GetTextSize(Textbox["34"].Text, Textbox["34"].TextSize, Textbox["34"].Font, Vector2.new(Textbox["34"].AbsoluteSize.X,Textbox["34"].AbsoluteSize.Y))
+
+						Library:Tween(Textbox["34"], {
+							Length = 0.2,
+							Goal = {Size = UDim2.new(0, (Bound.X + 18), 0, 21)}
+						})
+					end
+				end
+
+				task.spawn(function()
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
+				end)
+
+				return Textbox
+			end
+			
+			function Section:Dropdown(options)
+				options = Library:Place_Defaults({
+					Name = "Dropdown",
+					Items = {},
+					Callback = function(item) return end
+				}, options or {})
+
+				local Dropdown = {
+					Items = options.Items,
+					SelectedItem = nil,
+					ContainerOpened = false,
+					NameText = options.Name,
+					Hover = false
+				}
+
+				do
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown
+					Dropdown["46"] = Instance.new("Frame", Section["21"])
+					Dropdown["46"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["46"]["Size"] = UDim2.new(0, 423, 0, 34)
+					Dropdown["46"]["ClipsDescendants"] = true
+					Dropdown["46"]["Position"] = UDim2.new(0, 0, 0, 117)
+					Dropdown["46"]["Name"] = [[Dropdown]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.UICorner
+					Dropdown["47"] = Instance.new("UICorner", Dropdown["46"])
+					Dropdown["47"]["CornerRadius"] = UDim.new(0, 4)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Label
+					Dropdown["48"] = Instance.new("TextLabel", Dropdown["46"])
+					Dropdown["48"]["BorderSizePixel"] = 0
+					Dropdown["48"]["TextXAlignment"] = Enum.TextXAlignment.Left
+					Dropdown["48"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["48"]["TextSize"] = 13
+					Dropdown["48"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["48"]["Size"] = UDim2.new(0, 301, 0, 33)
+					Dropdown["48"]["Text"] = [[Dropdown]]
+					Dropdown["48"]["Name"] = [[Label]]
+					Dropdown["48"]["Font"] = Enum.Font.GothamMedium
+					Dropdown["48"]["BackgroundTransparency"] = 1
+					Dropdown["48"]["Position"] = UDim2.new(0, 21, 0, 0)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Open
+					Dropdown["49"] = Instance.new("ImageButton", Dropdown["46"])
+					Dropdown["49"]["ScaleType"] = Enum.ScaleType.Crop
+					Dropdown["49"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["49"]["Image"] = [[rbxassetid://11400266375]]
+					Dropdown["49"]["Size"] = UDim2.new(0, 14, 0, 10)
+					Dropdown["49"]["Name"] = [[Open]]
+					Dropdown["49"]["Position"] = UDim2.new(0, 397, 0, 10)
+					Dropdown["49"]["BackgroundTransparency"] = 1
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.UIStroke
+					Dropdown["4a"] = Instance.new("UIStroke", Dropdown["46"])
+					Dropdown["4a"]["Color"] = Color3.fromRGB(43, 43, 43)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container
+					Dropdown["4b"] = Instance.new("Frame", Dropdown["46"])
+					Dropdown["4b"]["BorderSizePixel"] = 0
+					Dropdown["4b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["4b"]["BackgroundTransparency"] = 1
+					Dropdown["4b"]["Size"] = UDim2.new(0, 423, 0, 72)
+					Dropdown["4b"]["Position"] = UDim2.new(0, 0, 0, 39)
+					Dropdown["4b"]["Name"] = [[Container]]
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.UIListLayout
+					Dropdown["4c"] = Instance.new("UIListLayout", Dropdown["4b"])
+					Dropdown["4c"]["Padding"] = UDim.new(0, 4)
+					Dropdown["4c"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.UIPadding
+					Dropdown["57"] = Instance.new("UIPadding", Dropdown["4b"])
+					Dropdown["57"]["PaddingLeft"] = UDim.new(0, 8)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.UIGradient
+					Dropdown["58"] = Instance.new("UIGradient", Dropdown["46"])
+					Dropdown["58"]["Rotation"] = 270
+					Dropdown["58"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Frame
+					Dropdown["59"] = Instance.new("Frame", Dropdown["46"])
+					Dropdown["59"]["BorderSizePixel"] = 0
+					Dropdown["59"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["59"]["BackgroundTransparency"] = 1
+					Dropdown["59"]["Size"] = UDim2.new(0, 390, 0, 34)
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Frame.UIListLayout
+					Dropdown["5a"] = Instance.new("UIListLayout", Dropdown["59"])
+					Dropdown["5a"]["VerticalAlignment"] = Enum.VerticalAlignment.Center
+					Dropdown["5a"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Right
+					Dropdown["5a"]["SortOrder"] = Enum.SortOrder.LayoutOrder
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Frame.TextLabel
+					Dropdown["5b"] = Instance.new("TextLabel", Dropdown["59"])
+					Dropdown["5b"]["BorderSizePixel"] = 0
+					Dropdown["5b"]["BackgroundColor3"] = Color3.fromRGB(51, 51, 51)
+					Dropdown["5b"]["TextSize"] = 9
+					Dropdown["5b"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+					Dropdown["5b"]["Size"] = UDim2.new(0, 50, 0, 15)
+					Dropdown["5b"]["Font"] = Enum.Font.Gotham
+
+					-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Frame.TextLabel.UICorner
+					Dropdown["5c"] = Instance.new("UICorner", Dropdown["5b"])
+					Dropdown["5c"]["CornerRadius"] = UDim.new(0, 4)
+				end
+
+				-- Handler
+				do					
+					Dropdown["46"].MouseEnter:Connect(function()
+						Dropdown.Hover = true
+						
+						Library:Tween(Dropdown["4a"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(65, 65, 65)}
+						})
+					end)
+
+					Dropdown["46"].MouseLeave:Connect(function()
+						Dropdown.Hover = false
+						
+						Library:Tween(Dropdown["4a"], {
+							Length = 0.5,
+							Goal = {Color = Color3.fromRGB(43, 43, 43)}
+						})
+					end)
+					
+					UserInputService.InputBegan:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.MouseButton1 and Dropdown.Hover then
+							Library:Tween(Dropdown["4a"], {
+								Length = 0.2,
+								Goal = {Color = Color3.fromRGB(86, 86, 86)}
+							})
+
+							if Dropdown.Hover then
+								Library:Tween(Dropdown["4a"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(65, 65, 65)}
+								})
+							else
+								Library:Tween(Dropdown["4a"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(43, 43, 43)}
+								})
+							end
+							
+							do
+								if Dropdown.ContainerOpened then
+									Dropdown.ContainerOpened = false
+									
+									Library:Tween(Dropdown["46"], {
+										Length = 0.5,
+										Goal = {Size = UDim2.fromOffset(423, 34)}
+									})
+									
+									task.wait(0.7)
+
+									task.spawn(function()
+										Library:ResizeSection(Section["1e"])
+										task.wait(0.7)
+										Library:ResizeCanvas(Tab["1d"])
+									end)
+								else
+									Dropdown.ContainerOpened = true
+									
+									Dropdown:ResizeOpenedFrame()
+								end
+
+								task.wait(0.7)
+
+								task.spawn(function()
+									Library:ResizeCanvas(Tab["1d"])
+								end)
+							end
+						end
+					end)
+				end
+
+				-- Methods
+				do
+					
+					function Dropdown:AddItem(value)
+						local DropdownOption = {
+							Hover = false,
+							CallbackVal = value
+						}
+
+						do
+							-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.Option 1
+							DropdownOption["4d"] = Instance.new("Frame", Dropdown["4b"])
+							DropdownOption["4d"]["BackgroundColor3"] = Color3.fromRGB(149, 149, 149)
+							DropdownOption["4d"]["Size"] = UDim2.new(0, 407, 0, 27)
+							DropdownOption["4d"]["Position"] = UDim2.new(0, 7, 0, 22)
+							DropdownOption["4d"]["Name"] = [[Option 1]]
+
+							-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.Option 1.UICorner
+							DropdownOption["4e"] = Instance.new("UICorner", DropdownOption["4d"])
+							DropdownOption["4e"]["CornerRadius"] = UDim.new(0, 4)
+
+							-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.Option 1.Label
+							DropdownOption["4f"] = Instance.new("TextLabel", DropdownOption["4d"])
+							DropdownOption["4f"]["BorderSizePixel"] = 0
+							DropdownOption["4f"]["TextXAlignment"] = Enum.TextXAlignment.Left
+							DropdownOption["4f"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+							DropdownOption["4f"]["TextSize"] = 13
+							DropdownOption["4f"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+							DropdownOption["4f"]["Size"] = UDim2.new(0, 301, 0, 33)
+							DropdownOption["4f"]["Text"] = tostring(value)
+							DropdownOption["4f"]["Name"] = [[Label]]
+							DropdownOption["4f"]["Font"] = Enum.Font.GothamMedium
+							DropdownOption["4f"]["BackgroundTransparency"] = 1
+							DropdownOption["4f"]["Position"] = UDim2.new(0, 14, 0, -3)
+
+							-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.Option 1.UIStroke
+							DropdownOption["50"] = Instance.new("UIStroke", DropdownOption["4d"])
+							DropdownOption["50"]["Color"] = Color3.fromRGB(43, 43, 43)
+
+							-- StarterGui.Vision Lib v2.GuiFrame.MainFrame.Container.SectionFrame.SectionContainer.Dropdown.Container.Option 1.UIGradient
+							DropdownOption["51"] = Instance.new("UIGradient", DropdownOption["4d"])
+							DropdownOption["51"]["Rotation"] = 270
+							DropdownOption["51"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(86, 86, 86)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(89, 89, 89))}
+						end
+
+						DropdownOption["4d"].MouseEnter:Connect(function()
+							DropdownOption.Hover = true
+
+							Library:Tween(DropdownOption["50"], {
+								Length = 0.5,
+								Goal = {Color = Color3.fromRGB(65, 65, 65)}
+							})
+						end)
+
+						DropdownOption["4d"].MouseLeave:Connect(function()
+							DropdownOption.Hover = false
+
+							Library:Tween(DropdownOption["50"], {
+								Length = 0.5,
+								Goal = {Color = Color3.fromRGB(43, 43, 43)}
+							})
+						end)
+
+						UserInputService.InputBegan:Connect(function(input)
+							if input.UserInputType == Enum.UserInputType.MouseButton1 and DropdownOption.Hover then
+								Library:Tween(DropdownOption["50"], {
+									Length = 0.2,
+									Goal = {Color = Color3.fromRGB(86, 86, 86)}
+								})
+
+								task.spawn(function()
+									options.Callback(DropdownOption.CallbackVal)
+								end)
+
+								if DropdownOption.Hover then
+									Library:Tween(DropdownOption["50"], {
+										Length = 0.2,
+										Goal = {Color = Color3.fromRGB(65, 65, 65)}
+									})
+								else
+									Library:Tween(DropdownOption["50"], {
+										Length = 0.2,
+										Goal = {Color = Color3.fromRGB(43, 43, 43)}
+									})
+								end
+								
+								Dropdown.SelectedItem = DropdownOption.CallbackVal
+								Dropdown["5b"].Text = tostring(Dropdown.SelectedItem)
+								
+								local Bound = TextService:GetTextSize(Dropdown["5b"].Text, Dropdown["5b"].TextSize, Dropdown["5b"].Font, Vector2.new(Dropdown["5b"].AbsoluteSize.X, Dropdown["5b"].AbsoluteSize.Y))
+
+								Library:Tween(Dropdown["5b"], {
+									Length = 0.2,
+									Goal = {Size = UDim2.new(0, (Bound.X + 14), 0, 21)}
 								})
 							end
 						end)
-					end
-				end)
-				
-				UserInputService.InputEnded:connect(function(key)
-					if key.UserInputType == Enum.UserInputType.MouseButton1 then
-						MouseDown = false
-					end
-				end)
-			end
-			
-			Slider:SetValue(options.Default)
-			
-			Library:ResizeCanvas(Tab["b"])
-			return Slider
-		end
-		
-		-- Dropdown
-		function Tab:Dropdown(options)
-			options = Library:Place_Defaults({
-				Name = "Dropdown",
-				Items = {},
-				Callback = function(item) return end
-			}, options or {})
-
-			local Dropdown = {
-				Items = options.Items,
-				SelectedItem = "nil",
-				ContainerOpened = false,
-				NameText = options.Name
-			}
-			
-			function Dropdown:Toggle()
-				if Dropdown.ContainerOpened then
-					Library:Tween(Dropdown["2d"], {
-						Length = 0.2,
-						Goal = {Size = UDim2.fromOffset(400, 30)}
-					})
-					
-					Library:Tween(Dropdown["42"], {
-						Length = 0.2,
-						Goal = {Transparency = 1}
-					})
-					
-					Dropdown.ContainerOpened = false
-				else
-					Dropdown:ResizeOpenedFrame()
-					
-					Library:Tween(Dropdown["42"], {
-						Length = 0.2,
-						Goal = {Transparency = 0}
-					})
-					
-					Dropdown.ContainerOpened = true
-				end
-				
-				task.spawn(function()
-					task.wait(0.2)
-					Library:ResizeCanvas(Tab["b"])
-				end)
-			end
-			
-			function Dropdown:ResizeOpenedFrame()
-				local NumChild = 0
-				
-				for i, v in pairs(Dropdown["32"]:GetChildren()) do
-					if v:IsA("TextButton") then
-						NumChild += 1
-					end
-				end
-				
-				local FrameYOffset = 20 * NumChild + 3 * NumChild + 30 + 5
-				
-				Library:Tween(Dropdown["2d"], {
-					Length = 0.2,
-					Goal = {Size = UDim2.fromOffset(400, FrameYOffset)}
-				})
-			end
-			
-			function Dropdown:ResizeContainer()
-				local NumChild = 0
-
-				for i, v in pairs(Dropdown["32"]:GetChildren()) do
-					if v:IsA("TextButton") then
-						NumChild += 1
-					end
-				end
-
-				local FrameYOffset = 20 * NumChild + 3 * NumChild
-
-				Library:Tween(Dropdown["32"], {
-					Length = 0.1,
-					Goal = {Size = UDim2.fromOffset(400, FrameYOffset)}
-				})
-			end
-
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame
-				Dropdown["2d"] = Instance.new("Frame", Tab["b"])
-				Dropdown["2d"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Dropdown["2d"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Dropdown["2d"]["Position"] = UDim2.new(0.03596287593245506, 0, 0.125, 0)
-				Dropdown["2d"]["Name"] = [[DropdownFrame]]
-				Dropdown["2d"]["ClipsDescendants"] = true
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.TextLabel
-				Dropdown["2e"] = Instance.new("TextLabel", Dropdown["2d"])
-				Dropdown["2e"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Dropdown["2e"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Dropdown["2e"]["TextSize"] = 14
-				Dropdown["2e"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Dropdown["2e"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Dropdown["2e"]["Text"] = "  "..options.Name.." > nil"
-				Dropdown["2e"]["Font"] = Enum.Font.Gotham
-				Dropdown["2e"]["BackgroundTransparency"] = 1
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.ImageButton
-				Dropdown["2f"] = Instance.new("ImageButton", Dropdown["2d"])
-				Dropdown["2f"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Dropdown["2f"]["Image"] = [[rbxassetid://11280363344]]
-				Dropdown["2f"]["Size"] = UDim2.new(0, 17, 0, 17)
-				Dropdown["2f"]["Position"] = UDim2.new(0.9325000047683716, 0, 0, 6)
-				Dropdown["2f"]["BackgroundTransparency"] = 1
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.UICorner
-				Dropdown["30"] = Instance.new("UICorner", Dropdown["2d"])
-				Dropdown["30"]["CornerRadius"] = UDim.new(0, 4)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.UIStroke
-				Dropdown["31"] = Instance.new("UIStroke", Dropdown["2d"])
-				Dropdown["31"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Dropdown["31"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.Container
-				Dropdown["32"] = Instance.new("Frame", Dropdown["2d"])
-				Dropdown["32"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Dropdown["32"]["BackgroundTransparency"] = 1
-				Dropdown["32"]["Size"] = UDim2.new(0, 400, 0, 161)
-				Dropdown["32"]["Position"] = UDim2.new(0, 0, 0, 32)
-				Dropdown["32"]["Name"] = [[Container]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.Container.UIListLayout
-				Dropdown["33"] = Instance.new("UIListLayout", Dropdown["32"])
-				Dropdown["33"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center
-				Dropdown["33"]["Padding"] = UDim.new(0, 3)
-				Dropdown["33"]["SortOrder"] = Enum.SortOrder.LayoutOrder
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.Seperator
-				Dropdown["42"] = Instance.new("Frame", Dropdown["2d"])
-				Dropdown["42"]["BorderSizePixel"] = 0
-				Dropdown["42"]["BackgroundColor3"] = Color3.fromRGB(45, 45, 45)
-				Dropdown["42"]["BackgroundTransparency"] = 0.009999999776482582
-				Dropdown["42"]["Size"] = UDim2.new(0, 400, 0, 2)
-				Dropdown["42"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-				Dropdown["42"]["Position"] = UDim2.new(-0.00017981277778744698, 0, 0, 27)
-				Dropdown["42"]["Name"] = [[Seperator]]
-				Dropdown["42"]["Transparency"] = 1
-			end
-			
-			-- Create button
-			do
-				function Dropdown:CreateButton(Value)
-					local DropdownButton = {
-						ItemValue = Value
-					}
-					
-					-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.Container.TextButton
-					DropdownButton["34"] = Instance.new("TextButton", Dropdown["32"])
-					DropdownButton["34"]["TextSize"] = 14
-					DropdownButton["34"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-					DropdownButton["34"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-					DropdownButton["34"]["Text"] = tostring(Value)
-					DropdownButton["34"]["Size"] = UDim2.new(0, 380, 0, 20)
-					DropdownButton["34"]["Font"] = Enum.Font.Gotham
-					DropdownButton["34"]["AutoButtonColor"] = false
-
-					-- StarterGui.VisionLib.MainFrame.MainContainer.DropdownFrame.Container.TextButton.UICorner
-					DropdownButton["35"] = Instance.new("UICorner", DropdownButton["34"])
-					DropdownButton["35"]["CornerRadius"] = UDim.new(0, 3)
-					
-					DropdownButton["34"].MouseEnter:Connect(function()
-						Library:Tween(DropdownButton["34"], {
-							Length = 0.1,
-							Goal = {BackgroundColor3 = Color3.fromRGB(27, 27, 27)}
-						})
-					end)
-					
-					DropdownButton["34"].MouseLeave:Connect(function()
-						Library:Tween(DropdownButton["34"], {
-							Length = 0.1,
-							Goal = {BackgroundColor3 = Color3.fromRGB(36, 36, 36)}
-						})
-					end)
-					
-					DropdownButton["34"].MouseButton1Click:Connect(function()
-						Library:Tween(DropdownButton["34"], {
-							Length = 0.1,
-							Goal = {BackgroundColor3 = Color3.fromRGB(54, 54, 54)}
-						})
 						
-						pcall(function()
-							options.Callback(DropdownButton.ItemValue)
+						if Dropdown.SelectedItem == nil then
+							Dropdown.SelectedItem = DropdownOption.CallbackVal
+							Dropdown["5b"].Text = tostring(Dropdown.SelectedItem)
+							
+							local Bound = TextService:GetTextSize(Dropdown["5b"].Text, Dropdown["5b"].TextSize, Dropdown["5b"].Font, Vector2.new(Dropdown["5b"].AbsoluteSize.X, Dropdown["5b"].AbsoluteSize.Y))
+
+							Library:Tween(Dropdown["5b"], {
+								Length = 0.2,
+								Goal = {Size = UDim2.new(0, (Bound.X + 14), 0, 21)}
+							})
+						end
+						
+						if Dropdown.ContainerOpened then
+							Dropdown:ResizeOpenedFrame()
+						end
+
+						task.wait(0.6)
+
+						task.spawn(function()
+							Library:ResizeSection(Section["1e"])
+							task.wait(1)
+							Library:ResizeCanvas(Tab["1d"])
 						end)
-						
-						Dropdown.SelectedItem = tostring(DropdownButton.ItemValue)
-						Dropdown["2e"]["Text"] = "  "..Dropdown.NameText.." > "..tostring(Dropdown.SelectedItem)
-						
-						task.wait(0.1)
-						Library:Tween(DropdownButton["34"], {
-							Length = 0.1,
-							Goal = {BackgroundColor3 = Color3.fromRGB(36, 36, 36)}
-						})
-					end)
-				end
-			end
-			
-			-- Methods
-			do
-				function Dropdown:UpdateList(options)
-					options = Library:Place_Defaults({
-						Items = {},
-						Replace = true
-					}, options or {})
+					end
 					
-					if options.Replace then
-						for i, v in pairs(Dropdown["32"]:GetChildren()) do
-							if v:IsA("TextButton") then
+					function Dropdown:Clear()
+						for i, v in pairs(Dropdown["4b"]:GetChildren()) do
+							if v:IsA("Frame") then
 								v:Destroy()
 							end
 						end
-					end
-					
-					for i, v in pairs(options.Items) do
-						Dropdown:CreateButton(v)
-					end
-					
-					if Dropdown.ContainerOpened then
-						Dropdown:ResizeOpenedFrame()
-					end
-					Dropdown:ResizeContainer()
-				end
-				
-				function Dropdown:ClearList()
-					for i, v in pairs(Dropdown["32"]:GetChildren()) do
-						if v:IsA("TextButton") then
-							v:Destroy()
-						end
-					end
-
-					if Dropdown.ContainerOpened then
-						Dropdown:ResizeOpenedFrame()
-					end
-					Dropdown:ResizeContainer()
-				end
-				
-				function Dropdown:AddItem(Item)
-					Dropdown:CreateButton(Item)
-
-					if Dropdown.ContainerOpened then
-						Dropdown:ResizeOpenedFrame()
-					end
-					Dropdown:ResizeContainer()
-				end
-				
-				function Dropdown:SetText(Text)
-					Dropdown["2e"]["Text"] = "  "..Text.." > "..tostring(Dropdown.SelectedItem)
-					Dropdown.NameText = Text
-				end
-			end
-			
-			-- Handler 
-			do
-				Dropdown["2f"].MouseEnter:Connect(function()
-					Library:Tween(Dropdown["2f"], {
-						Length = 0.2,
-						Goal = {ImageColor3 = Color3.fromRGB(136, 103, 177)}
-					})
-				end)
-				
-				Dropdown["2f"].MouseLeave:Connect(function()
-					Library:Tween(Dropdown["2f"], {
-						Length = 0.2,
-						Goal = {ImageColor3 = Color3.fromRGB(255, 255, 255)}
-					})
-				end)
-				
-				Dropdown["2f"].MouseButton1Click:Connect(function()
-					Dropdown:Toggle()
-				end)
-			end
-			
-			Dropdown:UpdateList({
-				Items = options.Items,
-				Replace = true
-			})
-			
-			Library:ResizeCanvas(Tab["b"])
-			return Dropdown
-		end
-		
-		-- Colorpicker
-		function Tab:Colorpicker(options)
-			options = Library:Place_Defaults({
-				Name = "Colorpicker",
-				DefaultColor = Color3.new(1, 1, 1),
-				Callback = function() return end
-			}, options or {})
-
-			local Colorpicker = {
-				HueHover = false,
-				SatHover = false,
-				LightHover = false,
-				HueVal = 0,
-				SatVal = 0,
-				LightVal = 0,
-				ColorVal = options.DefaultColor
-			}
-			
-			local dh, ds ,dv = options.DefaultColor:ToHSV()
-			
-			Colorpicker.HueVal = dh
-			Colorpicker.SatVal = ds
-			Colorpicker.LightVal = dv
-
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame
-				Colorpicker["6e"] = Instance.new("Frame", Tab["b"])
-				Colorpicker["6e"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Colorpicker["6e"]["Size"] = UDim2.new(0, 400, 0, 161)
-				Colorpicker["6e"]["Position"] = UDim2.new(0.003480277955532074, 0, 0.6021980047225952, 0)
-				Colorpicker["6e"]["Name"] = [[ColorPickerFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.UICorner
-				Colorpicker["6f"] = Instance.new("UICorner", Colorpicker["6e"])
-				Colorpicker["6f"]["CornerRadius"] = UDim.new(0, 4)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.UIStroke
-				Colorpicker["70"] = Instance.new("UIStroke", Colorpicker["6e"])
-				Colorpicker["70"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Colorpicker["70"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker
-				Colorpicker["71"] = Instance.new("Frame", Colorpicker["6e"])
-				Colorpicker["71"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["71"]["BackgroundTransparency"] = 1
-				Colorpicker["71"]["Size"] = UDim2.new(0, 400, 0, 86)
-				Colorpicker["71"]["Position"] = UDim2.new(0, 0, 0.23499999940395355, 0)
-				Colorpicker["71"]["Name"] = [[ColorPicker]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Hue
-				Colorpicker["72"] = Instance.new("ImageLabel", Colorpicker["71"])
-				Colorpicker["72"]["ScaleType"] = Enum.ScaleType.Crop
-				Colorpicker["72"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["72"]["Image"] = [[rbxassetid://11362678635]]
-				Colorpicker["72"]["Size"] = UDim2.new(0, 380, 0, 25)
-				Colorpicker["72"]["Position"] = UDim2.new(0.030000001192092896, 0, 0.04329953342676163, 0)
-				Colorpicker["72"]["LayoutOrder"] = 0
-				Colorpicker["72"]["Name"] = [[Hue]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Hue.UICorner
-				Colorpicker["73"] = Instance.new("UICorner", Colorpicker["72"])
-				Colorpicker["73"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Hue.Frame
-				Colorpicker["74"] = Instance.new("Frame", Colorpicker["72"])
-				Colorpicker["74"]["BackgroundColor3"] = Color3.fromRGB(255, 48, 48)
-				Colorpicker["74"]["Size"] = UDim2.new(0, 5, 0, 25)
-				Colorpicker["74"]["Position"] = UDim2.new(0.2631579041481018, 0, 0, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Hue.Frame.UICorner
-				Colorpicker["75"] = Instance.new("UICorner", Colorpicker["74"])
-				Colorpicker["75"]["CornerRadius"] = UDim.new(0, 3)
-				
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Hue.Frame.UIStroke
-				Colorpicker["1c"] = Instance.new("UIStroke", Colorpicker["74"])
-				Colorpicker["1c"]["Color"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["1c"]["Thickness"] = 1
-				Colorpicker["1c"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Saturation
-				Colorpicker["76"] = Instance.new("Frame", Colorpicker["71"])
-				Colorpicker["76"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["76"]["Size"] = UDim2.new(0, 380, 0, 25)
-				Colorpicker["76"]["Position"] = UDim2.new(0.02500000037252903, 0, 0.3109756112098694, 0)
-				Colorpicker["76"]["Name"] = [[Saturation]]
-				Colorpicker["76"]["LayoutOrder"] = 1
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Saturation.UICorner
-				Colorpicker["77"] = Instance.new("UICorner", Colorpicker["76"])
-				Colorpicker["77"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Saturation.UIGradient
-				Colorpicker["78"] = Instance.new("UIGradient", Colorpicker["76"])
-				Colorpicker["78"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 0, 0))}
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Saturation.Frame
-				Colorpicker["79"] = Instance.new("Frame", Colorpicker["76"])
-				Colorpicker["79"]["BackgroundColor3"] = Color3.fromRGB(181, 181, 181)
-				Colorpicker["79"]["Size"] = UDim2.new(0, 5, 0, 25)
-				Colorpicker["79"]["Position"] = UDim2.new(0.17368420958518982, 0, 0, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Saturation.Frame.UICorner
-				Colorpicker["7a"] = Instance.new("UICorner", Colorpicker["79"])
-				Colorpicker["7a"]["CornerRadius"] = UDim.new(0, 3)
-				
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Saturation.Frame.UIStroke
-				Colorpicker["1d"] = Instance.new("UIStroke", Colorpicker["79"])
-				Colorpicker["1d"]["Color"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["1d"]["Thickness"] = 1
-				Colorpicker["1d"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Brightness
-				Colorpicker["7b"] = Instance.new("Frame", Colorpicker["71"])
-				Colorpicker["7b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["7b"]["Size"] = UDim2.new(0, 380, 0, 25)
-				Colorpicker["7b"]["Position"] = UDim2.new(0.02500000037252903, 0, 0.3109756112098694, 0)
-				Colorpicker["7b"]["Name"] = [[Brightness]]
-				Colorpicker["7b"]["LayoutOrder"] = 2
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Brightness.UICorner
-				Colorpicker["7c"] = Instance.new("UICorner", Colorpicker["7b"])
-				Colorpicker["7c"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Brightness.UIGradient
-				Colorpicker["7d"] = Instance.new("UIGradient", Colorpicker["7b"])
-				Colorpicker["7d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 0, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 0, 0))}
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Brightness.Frame
-				Colorpicker["7e"] = Instance.new("Frame", Colorpicker["7b"])
-				Colorpicker["7e"]["BackgroundColor3"] = Color3.fromRGB(181, 181, 181)
-				Colorpicker["7e"]["Size"] = UDim2.new(0, 5, 0, 25)
-				Colorpicker["7e"]["Position"] = UDim2.new(0.15526315569877625, 0, 0, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Brightness.Frame.UICorner
-				Colorpicker["7f"] = Instance.new("UICorner", Colorpicker["7e"])
-				Colorpicker["7f"]["CornerRadius"] = UDim.new(0, 3)
-				
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.Brightness.Frame.UIStroke
-				Colorpicker["1e"] = Instance.new("UIStroke", Colorpicker["7e"])
-				Colorpicker["1e"]["Color"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["1e"]["Thickness"] = 1
-				Colorpicker["1e"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.UIListLayout
-				Colorpicker["80"] = Instance.new("UIListLayout", Colorpicker["71"])
-				Colorpicker["80"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center
-				Colorpicker["80"]["Padding"] = UDim.new(0, 5)
-				Colorpicker["80"]["SortOrder"] = Enum.SortOrder.LayoutOrder
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorPicker.UIPadding
-				Colorpicker["81"] = Instance.new("UIPadding", Colorpicker["71"])
-
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.TextLabel
-				Colorpicker["82"] = Instance.new("TextLabel", Colorpicker["6e"])
-				Colorpicker["82"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Colorpicker["82"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Colorpicker["82"]["TextSize"] = 14
-				Colorpicker["82"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["82"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Colorpicker["82"]["Text"] = "  "..options.Name
-				Colorpicker["82"]["Font"] = Enum.Font.Gotham
-				Colorpicker["82"]["BackgroundTransparency"] = 1
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.Seperator
-				Colorpicker["83"] = Instance.new("Frame", Colorpicker["6e"])
-				Colorpicker["83"]["BorderSizePixel"] = 0
-				Colorpicker["83"]["BackgroundColor3"] = Color3.fromRGB(45, 45, 45)
-				Colorpicker["83"]["BackgroundTransparency"] = 0.009999999776482582
-				Colorpicker["83"]["Size"] = UDim2.new(0, 400, 0, 2)
-				Colorpicker["83"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-				Colorpicker["83"]["Position"] = UDim2.new(-0.00017981277778744698, 0, 0.18113110959529877, 0)
-				Colorpicker["83"]["Name"] = [[Seperator]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorDisplay
-				Colorpicker["84"] = Instance.new("Frame", Colorpicker["6e"])
-				Colorpicker["84"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["84"]["Size"] = UDim2.new(0, 22, 0, 22)
-				Colorpicker["84"]["Position"] = UDim2.new(0.9325000047683716, 0, 0.019999999552965164, 0)
-				Colorpicker["84"]["Name"] = [[ColorDisplay]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.ColorDisplay.UICorner
-				Colorpicker["85"] = Instance.new("UICorner", Colorpicker["84"])
-				Colorpicker["85"]["CornerRadius"] = UDim.new(0, 4)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder
-				Colorpicker["86"] = Instance.new("Frame", Colorpicker["6e"])
-				Colorpicker["86"]["BorderSizePixel"] = 0
-				Colorpicker["86"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["86"]["BackgroundTransparency"] = 1
-				Colorpicker["86"]["Size"] = UDim2.new(0, 400, 0, 36)
-				Colorpicker["86"]["Position"] = UDim2.new(0, 0, 0.76295006275177, 0)
-				Colorpicker["86"]["Name"] = [[RGBHolder]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Hue
-				Colorpicker["87"] = Instance.new("Frame", Colorpicker["86"])
-				Colorpicker["87"]["BorderSizePixel"] = 0
-				Colorpicker["87"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["87"]["BackgroundTransparency"] = 1
-				Colorpicker["87"]["Size"] = UDim2.new(0, 91, 0, 37)
-				Colorpicker["87"]["Name"] = [[Hue]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Hue.TextLabel
-				Colorpicker["88"] = Instance.new("TextLabel", Colorpicker["87"])
-				Colorpicker["88"]["TextWrapped"] = true
-				Colorpicker["88"]["BorderSizePixel"] = 0
-				Colorpicker["88"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["88"]["TextSize"] = 11
-				Colorpicker["88"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["88"]["Size"] = UDim2.new(0, 45, 0, 25)
-				Colorpicker["88"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-				Colorpicker["88"]["Text"] = [[Hue]]
-				Colorpicker["88"]["Font"] = Enum.Font.Gotham
-				Colorpicker["88"]["BackgroundTransparency"] = 1
-				Colorpicker["88"]["Position"] = UDim2.new(-0.0012891516089439392, 0, 0.13513514399528503, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Hue.TextBox
-				Colorpicker["89"] = Instance.new("TextBox", Colorpicker["87"])
-				Colorpicker["89"]["CursorPosition"] = -1
-				Colorpicker["89"]["ZIndex"] = 5
-				Colorpicker["89"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["89"]["TextWrapped"] = true
-				Colorpicker["89"]["TextSize"] = 11
-				Colorpicker["89"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Colorpicker["89"]["Size"] = UDim2.new(0, 42, 0, 18)
-				Colorpicker["89"]["Text"] = [[256]]
-				Colorpicker["89"]["Position"] = UDim2.new(0.4914590120315552, 0, 0.25, 0)
-				Colorpicker["89"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Hue.TextBox.UICorner
-				Colorpicker["8a"] = Instance.new("UICorner", Colorpicker["89"])
-				Colorpicker["8a"]["CornerRadius"] = UDim.new(0, 4)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.UIListLayout
-				Colorpicker["8b"] = Instance.new("UIListLayout", Colorpicker["86"])
-				Colorpicker["8b"]["FillDirection"] = Enum.FillDirection.Horizontal
-				Colorpicker["8b"]["SortOrder"] = Enum.SortOrder.LayoutOrder
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Value
-				Colorpicker["8c"] = Instance.new("Frame", Colorpicker["86"])
-				Colorpicker["8c"]["BorderSizePixel"] = 0
-				Colorpicker["8c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["8c"]["BackgroundTransparency"] = 1
-				Colorpicker["8c"]["Size"] = UDim2.new(0, 91, 0, 37)
-				Colorpicker["8c"]["Name"] = [[Value]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Value.TextLabel
-				Colorpicker["8d"] = Instance.new("TextLabel", Colorpicker["8c"])
-				Colorpicker["8d"]["TextWrapped"] = true
-				Colorpicker["8d"]["BorderSizePixel"] = 0
-				Colorpicker["8d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["8d"]["TextSize"] = 11
-				Colorpicker["8d"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["8d"]["Size"] = UDim2.new(0, 45, 0, 25)
-				Colorpicker["8d"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-				Colorpicker["8d"]["Text"] = [[Value]]
-				Colorpicker["8d"]["Font"] = Enum.Font.Gotham
-				Colorpicker["8d"]["BackgroundTransparency"] = 1
-				Colorpicker["8d"]["Position"] = UDim2.new(-0.0012891516089439392, 0, 0.13513514399528503, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Value.TextBox
-				Colorpicker["8e"] = Instance.new("TextBox", Colorpicker["8c"])
-				Colorpicker["8e"]["ZIndex"] = 5
-				Colorpicker["8e"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["8e"]["TextWrapped"] = true
-				Colorpicker["8e"]["TextSize"] = 11
-				Colorpicker["8e"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Colorpicker["8e"]["Size"] = UDim2.new(0, 42, 0, 18)
-				Colorpicker["8e"]["Text"] = [[256]]
-				Colorpicker["8e"]["Position"] = UDim2.new(0.4914590120315552, 0, 0.25, 0)
-				Colorpicker["8e"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Value.TextBox.UICorner
-				Colorpicker["8f"] = Instance.new("UICorner", Colorpicker["8e"])
-				Colorpicker["8f"]["CornerRadius"] = UDim.new(0, 4)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Sat
-				Colorpicker["90"] = Instance.new("Frame", Colorpicker["86"])
-				Colorpicker["90"]["BorderSizePixel"] = 0
-				Colorpicker["90"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["90"]["BackgroundTransparency"] = 1
-				Colorpicker["90"]["Size"] = UDim2.new(0, 91, 0, 37)
-				Colorpicker["90"]["Name"] = [[Sat]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Sat.TextLabel
-				Colorpicker["91"] = Instance.new("TextLabel", Colorpicker["90"])
-				Colorpicker["91"]["TextWrapped"] = true
-				Colorpicker["91"]["BorderSizePixel"] = 0
-				Colorpicker["91"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["91"]["TextSize"] = 11
-				Colorpicker["91"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["91"]["Size"] = UDim2.new(0, 45, 0, 25)
-				Colorpicker["91"]["BorderColor3"] = Color3.fromRGB(28, 43, 54)
-				Colorpicker["91"]["Text"] = [[Sat]]
-				Colorpicker["91"]["Font"] = Enum.Font.Gotham
-				Colorpicker["91"]["BackgroundTransparency"] = 1
-				Colorpicker["91"]["Position"] = UDim2.new(-0.0012891516089439392, 0, 0.13513514399528503, 0)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Sat.TextBox
-				Colorpicker["92"] = Instance.new("TextBox", Colorpicker["90"])
-				Colorpicker["92"]["ZIndex"] = 5
-				Colorpicker["92"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Colorpicker["92"]["TextWrapped"] = true
-				Colorpicker["92"]["TextSize"] = 11
-				Colorpicker["92"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Colorpicker["92"]["Size"] = UDim2.new(0, 42, 0, 18)
-				Colorpicker["92"]["Text"] = [[256]]
-				Colorpicker["92"]["Position"] = UDim2.new(0.4914590120315552, 0, 0.25, 0)
-				Colorpicker["92"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.ColorPickerFrame.RGBHolder.Sat.TextBox.UICorner
-				Colorpicker["93"] = Instance.new("UICorner", Colorpicker["92"])
-				Colorpicker["93"]["CornerRadius"] = UDim.new(0, 4)
-			end
-			
-			do
-				-- Hue
-				Colorpicker["72"].MouseEnter:Connect(function()
-					Colorpicker.HueHover = true
-				end)
-				
-				-- Sat
-				Colorpicker["76"].MouseEnter:Connect(function()
-					Colorpicker.SatHover = true
-				end)
-				
-				-- Light
-				Colorpicker["7b"].MouseEnter:Connect(function()
-					Colorpicker.LightHover = true
-				end)
-				
-				Colorpicker["72"].MouseLeave:Connect(function()
-					Colorpicker.HueHover = false
-				end)
-
-				Colorpicker["76"].MouseLeave:Connect(function()
-					Colorpicker.SatHover = false
-				end)
-
-				Colorpicker["7b"].MouseLeave:Connect(function()
-					Colorpicker.LightHover = false
-				end)
-			end
-			
-			-- Methods
-			do
-				local function updateTextboxVal()
-					Colorpicker["89"]["Text"] = math.floor(Colorpicker.HueVal*256)
-					Colorpicker["92"]["Text"] = math.floor(Colorpicker.SatVal*256)
-					Colorpicker["8e"]["Text"] = math.floor(Colorpicker.LightVal*256)
-				end
-				
-				local MouseDown
-				
-				UserInputService.InputBegan:connect(function(key)
-					if key.UserInputType == Enum.UserInputType.MouseButton1 and Colorpicker.HueHover then
-						Library.Sliding = true
-						MouseDown = true
-
-						while RunService.RenderStepped:wait() and MouseDown do
-							local percentage = math.clamp((Mouse.X - Colorpicker["72"].AbsolutePosition.X) / (Colorpicker["72"].AbsoluteSize.X), 0, 1)
-							local value = ((255 - 0) * percentage) + 0
-							
-							value = math.floor(value)
-							Colorpicker.HueVal = percentage
-							local huecolor = Color3.fromHSV(Colorpicker.HueVal, 1, 1)
-							local satcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, 1)
-							local lightcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-							
-							Library:Tween(Colorpicker["74"], {
-								Length = 0.06,
-								Goal = {Position = UDim2.new((percentage-0.007), 0, 0, 0)}
-							})
-							
-							Library:Tween(Colorpicker["74"], {
-								Length = 0.06,
-								Goal = {BackgroundColor3 = huecolor}
-							})
-							
-							Library:Tween(Colorpicker["79"], {
-								Length = 0.06,
-								Goal = {BackgroundColor3 = satcolor}
-							})
-							
-							Library:Tween(Colorpicker["7e"], {
-								Length = 0.06,
-								Goal = {BackgroundColor3 = lightcolor}
-							})
-							
-							Colorpicker["78"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, huecolor)}
-							Colorpicker["7d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 0, 0)),ColorSequenceKeypoint.new(1.000, satcolor)}
-							
-							Colorpicker.ColorVal = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-							Colorpicker["84"]["BackgroundColor3"] = Colorpicker.ColorVal
-							options.Callback(Colorpicker.ColorVal)
-							updateTextboxVal()
-						end
-					elseif key.UserInputType == Enum.UserInputType.MouseButton1 and Colorpicker.SatHover then
-						Library.Sliding = true
-						MouseDown = true
-
-						while RunService.RenderStepped:wait() and MouseDown do
-							local percentage = math.clamp((Mouse.X - Colorpicker["76"].AbsolutePosition.X) / (Colorpicker["76"].AbsoluteSize.X), 0, 1)
-							local value = ((255 - 0) * percentage) + 0
-
-							value = math.floor(value)
-							Colorpicker.SatVal = percentage
-							local satcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, 1)
-							local lightcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-							
-
-							Library:Tween(Colorpicker["79"], {
-								Length = 0.06,
-								Goal = {Position = UDim2.new((percentage-0.007), 0, 0, 0)}
-							})
-
-							Library:Tween(Colorpicker["79"], {
-								Length = 0.06,
-								Goal = {BackgroundColor3 = satcolor}
-							})
-							
-							Library:Tween(Colorpicker["7e"], {
-								Length = 0.06,
-								Goal = {BackgroundColor3 = lightcolor}
-							})
-							
-							Colorpicker["7d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 0, 0)),ColorSequenceKeypoint.new(1.000, satcolor)}
-							
-							Colorpicker.ColorVal = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-							Colorpicker["84"]["BackgroundColor3"] = Colorpicker.ColorVal
-							options.Callback(Colorpicker.ColorVal)
-							updateTextboxVal()
-						end
-					elseif key.UserInputType == Enum.UserInputType.MouseButton1 and Colorpicker.LightHover then
-						Library.Sliding = true
-						MouseDown = true
-
-						while RunService.RenderStepped:wait() and MouseDown do
-							local percentage = math.clamp((Mouse.X - Colorpicker["76"].AbsolutePosition.X) / (Colorpicker["76"].AbsoluteSize.X), 0, 1)
-							local value = ((255 - 0) * percentage) + 0
-
-							value = math.floor(value)
-							Colorpicker.LightVal = percentage
-							local lightcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-
-
-							Library:Tween(Colorpicker["7e"], {
-								Length = 0.06,
-								Goal = {Position = UDim2.new((percentage-0.007), 0, 0, 0)}
-							})
-
-							Library:Tween(Colorpicker["7e"], {
-								Length = 0.06,
-								Goal = {BackgroundColor3 = lightcolor}
-							})
-							
-							Colorpicker.ColorVal = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-							Colorpicker["84"]["BackgroundColor3"] = Colorpicker.ColorVal
-							options.Callback(Colorpicker.ColorVal)
-							updateTextboxVal()
-						end
-					end
-					Library.Sliding = false
-					
-					Colorpicker.ColorVal = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-					Colorpicker["84"]["BackgroundColor3"] = Colorpicker.ColorVal
-					options.Callback(Colorpicker.ColorVal)
-					updateTextboxVal()
-				end)
-
-				UserInputService.InputEnded:connect(function(key)
-					if key.UserInputType == Enum.UserInputType.MouseButton1 then
-						MouseDown = false
-					end
-				end)
-				
-				function Colorpicker:SetText(Text)
-					Colorpicker["82"]["Text"] = "  "..Text
-				end
-				
-				function Colorpicker:SetColor(Color)
-					local NewH, NewS ,NewV = Color:ToHSV()
-
-					Colorpicker.HueVal = NewH
-					Colorpicker.SatVal = NewS
-					Colorpicker.LightVal = NewV
-					
-					do
-						local huecolor = Color3.fromHSV(Colorpicker.HueVal, 1, 1)
-
-						Library:Tween(Colorpicker["74"], {
-							Length = 1,
-							Goal = {Position = UDim2.new((Colorpicker.HueVal-0.007), 0, 0, 0)}
-						})
-
-						Library:Tween(Colorpicker["74"], {
-							Length = 1,
-							Goal = {BackgroundColor3 = huecolor}
-						})
-
-						Colorpicker["78"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, huecolor)}
-					end
-					
-					do
-						local satcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, 1)
-
-
-						Library:Tween(Colorpicker["79"], {
-							Length = 1,
-							Goal = {Position = UDim2.new((Colorpicker.SatVal-0.007), 0, 0, 0)}
-						})
-
-						Library:Tween(Colorpicker["79"], {
-							Length = 1,
-							Goal = {BackgroundColor3 = satcolor}
-						})
-
-						Colorpicker["7d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(0, 0, 0)),ColorSequenceKeypoint.new(1.000, satcolor)}
-					end
-					
-					do
-						local lightcolor = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-
-
-						Library:Tween(Colorpicker["7e"], {
-							Length = 1,
-							Goal = {Position = UDim2.new((Colorpicker.LightVal-0.007), 0, 0, 0)}
-						})
-
-						Library:Tween(Colorpicker["7e"], {
-							Length = 1,
-							Goal = {BackgroundColor3 = lightcolor}
-						})
-					end
-					
-					Colorpicker.ColorVal = Color3.fromHSV(Colorpicker.HueVal, Colorpicker.SatVal, Colorpicker.LightVal)
-					Colorpicker["84"]["BackgroundColor3"] = Colorpicker.ColorVal
-					updateTextboxVal()
-				end
-				
-				Colorpicker:SetColor(options.DefaultColor)
-			end
-			
-			Library:ResizeCanvas(Tab["b"])
-			return Colorpicker
-		end
-		
-		-- Keybind
-		function Tab:Keybind(options)
-			options = Library:Place_Defaults({
-				Name = "Keybind",
-				Default = Enum.KeyCode.Return,
-				Callback = function() return end,
-				UpdateKeyCallback = function() return end
-			}, options or {})
-
-			local Keybind = {
-				Focused = false,
-				Keybind = options.Default
-			}
-
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.KeybindFrame
-				Keybind["93"] = Instance.new("Frame", Tab["b"])
-				Keybind["93"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Keybind["93"]["BackgroundTransparency"] = 1
-				Keybind["93"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Keybind["93"]["Name"] = [[KeybindFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.KeybindFrame.TextLabel
-				Keybind["94"] = Instance.new("TextLabel", Keybind["93"])
-				Keybind["94"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Keybind["94"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Keybind["94"]["TextSize"] = 14
-				Keybind["94"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Keybind["94"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Keybind["94"]["Text"] = "  "..options.Name
-				Keybind["94"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.KeybindFrame.TextLabel.UICorner
-				Keybind["95"] = Instance.new("UICorner", Keybind["94"])
-				Keybind["95"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.KeybindFrame.TextLabel.UIStroke
-				Keybind["96"] = Instance.new("UIStroke", Keybind["94"])
-				Keybind["96"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Keybind["96"]["Thickness"] = 0.699999988079071
-				Keybind["96"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.KeybindFrame.TextButton
-				Keybind["97"] = Instance.new("TextButton", Keybind["93"])
-				Keybind["97"]["AutoLocalize"] = false
-				Keybind["97"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Keybind["97"]["TextWrapped"] = true
-				Keybind["97"]["TextSize"] = 11
-				Keybind["97"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Keybind["97"]["Size"] = UDim2.new(0, 85, 0, 20)
-				Keybind["97"]["Position"] = UDim2.new(0, 310, 0, 5)
-				Keybind["97"]["Font"] = Enum.Font.Gotham
-				Keybind["97"]["AutoButtonColor"] = false
-				
-				local keybindText = string.gsub(tostring(Keybind.Keybind), "Enum.KeyCode.", "")
-
-				Keybind["97"]["Text"] = keybindText
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.KeybindFrame.TextButton.UICorner
-				Keybind["98"] = Instance.new("UICorner", Keybind["97"])
-				Keybind["98"]["CornerRadius"] = UDim.new(0, 4)
-			end
-			
-			-- Methods
-			do
-				Keybind["97"].MouseEnter:Connect(function()
-					Library:Tween(Keybind["97"], {
-						Length = 0.2,
-						Goal = {BackgroundColor3 = Color3.fromRGB(56, 56, 56)}
-					})
-				end)
-
-				Keybind["97"].MouseLeave:Connect(function()
-					Library:Tween(Keybind["97"], {
-						Length = 0.2,
-						Goal = {BackgroundColor3 = Color3.fromRGB(16, 16, 16)}
-					})
-				end)
-				
-				Keybind["97"].MouseButton1Click:Connect(function()
-					Keybind.Focused = true
-					
-					Keybind["97"]["Text"] = "..."
-				end)
-
-				UserInputService.InputBegan:Connect(function(input, GameProcess)
-					if input.UserInputType == Enum.UserInputType.Keyboard then
-						if input.KeyCode == Keybind.Keybind then
-							pcall(function()
-								options.Callback()
-							end)
+						
+						local FrameYOffset = 34 + 4
+
+						if Dropdown.ContainerOpened then
+							Dropdown:ResizeOpenedFrame()
 						end
 						
-						if Keybind.Focused then
-							Keybind.Keybind = input.KeyCode
-							local keybindText = string.gsub(tostring(Keybind.Keybind), "Enum.KeyCode.", "")
-							Keybind["97"]["Text"] = keybindText
-							pcall(function()
-								options.UpdateKeyCallback(input.KeyCode)
-							end)
-							
-							Keybind.Focused = false
+						task.wait(0.6)
+						
+						task.spawn(function()
+							Library:ResizeSection(Section["1e"])
+							task.wait(1)
+							Library:ResizeCanvas(Tab["1d"])
+						end)
+					end
+					
+					function Dropdown:UpdateList(options)
+						options = Library:Place_Defaults({
+							Items = {},
+							Replace = true
+						}, options or {})
+						
+						if options.Replace then
+							for i, v in pairs(Dropdown["4b"]:GetChildren()) do
+								if v:IsA("Frame") then
+									v:Destroy()
+								end
+							end
+						end
+						
+						for i, v in pairs(options.Items) do
+							Dropdown:AddItem(v)
+						end
+						
+						if Dropdown.ContainerOpened then
+							Dropdown:ResizeOpenedFrame()
+						end
+
+						task.wait(0.6)
+
+						task.spawn(function()
+							Library:ResizeSection(Section["1e"])
+							task.wait(1)
+							Library:ResizeCanvas(Tab["1d"])
+						end)
+					end
+					
+					function Dropdown:ResizeOpenedFrame()
+						local FrameYOffset
+
+						do
+							local NumChild = 0
+
+							for i, v in pairs(Dropdown["4b"]:GetChildren()) do
+								if v:IsA("Frame") then
+									NumChild += 1
+								end
+							end
+
+							FrameYOffset = 27 * NumChild + 4 * NumChild + 4
+						end
+						
+						local SectionContainer = Section["21"]
+
+						local NumChild = 0
+						local ChildOffset = 0
+
+						for i, v in pairs(SectionContainer:GetChildren()) do
+							if v:IsA("Frame") then
+								NumChild += 1
+								ChildOffset = ChildOffset + v.Size.Y.Offset
+							end
+						end
+
+						local NumChildOffset = NumChild * 5
+
+						if Dropdown.ContainerOpened then
+							NumChildOffset += FrameYOffset
+						else
+							NumChildOffset -= FrameYOffset
+						end
+
+						local ContainerSize = NumChildOffset + ChildOffset + 10
+						local SectionSize = ContainerSize + 26
+
+						Library:Tween(SectionContainer, {
+							Length = 0.5,
+							Goal = {Size = UDim2.new(0, 458, 0, ContainerSize)}
+						})
+
+						Library:Tween(Section["1e"], {
+							Length = 0.5,
+							Goal = {Size = UDim2.new(0, 458, 0, SectionSize)}
+						})
+						
+						do
+							local NumChild = 0
+
+							for i, v in pairs(Dropdown["4b"]:GetChildren()) do
+								if v:IsA("Frame") then
+									NumChild += 1
+								end
+							end
+
+							local FrameYOffset = 27 * NumChild + 4 * NumChild + 38
+
+							Library:Tween(Dropdown["46"], {
+								Length = 0.5,
+								Goal = {Size = UDim2.fromOffset(423, FrameYOffset)}
+							})
 						end
 					end
-				end)
-				
-				function Keybind:SetText(name)
-					Keybind["94"]["Text"] = "  "..name
 				end
-			end
+				
+				do
+					task.spawn(function()
+						for i, v in pairs(options.Items) do
+							Dropdown:AddItem(v)
+						end
+					end)
+				end
 
-			Library:ResizeCanvas(Tab["b"])
-			return Keybind
+				task.spawn(function()
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
+				end)
+
+				return Dropdown
+			end
+			
+			--[[
+			function Section:Template(options)
+				options = Library:Place_Defaults({
+					Name = "Template",
+					Callback = function() return end
+				}, options or {})
+
+				local Template = {
+					Hover = false
+				}
+
+				do
+				end
+
+				-- Handler
+				do
+				end
+
+				-- Methods
+				do
+					
+				end
+
+				task.spawn(function()
+					Library:ResizeSection(Section["1e"])
+					task.wait(1)
+					Library:ResizeCanvas(Tab["1d"])
+				end)
+
+				return Template
+			end
+			]]--
+			
+			task.spawn(function()
+				Library:ResizeSection(Section["1e"])
+				task.wait(1)
+				Library:ResizeCanvas(Tab["1d"])
+			end)
+			
+			return Section
 		end
 		
-		-- Keybind
-		function Tab:Textbox(options)
-			options = Library:Place_Defaults({
-				Name = "Textbox",
-				PlaceholderText = "Input...",
-				Callback = function() return end,
-			}, options or {})
-
-			local Textbox = {
-				PlaceholderText = options.PlaceholderText
-			}
-
-			do
-				-- StarterGui.VisionLib.MainFrame.MainContainer.TextBoxFrame
-				Textbox["1d"] = Instance.new("Frame", Tab["b"])
-				Textbox["1d"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
-				Textbox["1d"]["BackgroundTransparency"] = 1
-				Textbox["1d"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Textbox["1d"]["Name"] = [[TextBoxFrame]]
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.TextBoxFrame.TextLabel
-				Textbox["1e"] = Instance.new("TextLabel", Textbox["1d"])
-				Textbox["1e"]["TextXAlignment"] = Enum.TextXAlignment.Left
-				Textbox["1e"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36)
-				Textbox["1e"]["TextSize"] = 14
-				Textbox["1e"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-				Textbox["1e"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Textbox["1e"]["Text"] = "  "..options.Name
-				Textbox["1e"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.TextBoxFrame.TextLabel.UICorner
-				Textbox["1f"] = Instance.new("UICorner", Textbox["1e"])
-				Textbox["1f"]["CornerRadius"] = UDim.new(0, 6)
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.TextBoxFrame.TextLabel.UIStroke
-				Textbox["20"] = Instance.new("UIStroke", Textbox["1e"])
-				Textbox["20"]["Color"] = Color3.fromRGB(60, 60, 60)
-				Textbox["20"]["Thickness"] = 0.699999988079071
-				Textbox["20"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.TextBoxFrame.TextBox
-				Textbox["21"] = Instance.new("TextBox", Textbox["1d"])
-				Textbox["21"]["CursorPosition"] = -1
-				Textbox["21"]["AutoLocalize"] = false
-				Textbox["21"]["TextWrapped"] = true
-				Textbox["21"]["TextSize"] = 13
-				Textbox["21"]["BackgroundColor3"] = Color3.fromRGB(16, 16, 16)
-				Textbox["21"]["Size"] = UDim2.new(0, 45, 0, 22)
-				Textbox["21"]["TextColor3"] = Color3.fromRGB(103, 103, 103)
-				Textbox["21"]["Text"] = options.PlaceholderText
-				Textbox["21"]["Position"] = UDim2.new(0, 350, 0, 4)
-				Textbox["21"]["Font"] = Enum.Font.Gotham
-
-				-- StarterGui.VisionLib.MainFrame.MainContainer.TextBoxFrame.TextBox.UICorner
-				Textbox["22"] = Instance.new("UICorner", Textbox["21"])
-				Textbox["22"]["CornerRadius"] = UDim.new(0, 4)
-			end
-
-			-- Methods
-			do
-				Textbox["21"].Focused:Connect(function()
-					Textbox["21"].Text = ""
-					Textbox["21"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
-					
-					Library:Tween(Textbox["21"], {
-						Length = 0.7,
-						Goal = {Position = UDim2.new(0, 311,0, 4)}
+		-- Handler
+		do	
+			Tab["8"].MouseEnter:Connect(function()
+				Tab.Hover = true
+				
+				if not Tab.Active then
+					Library:Tween(Tab["8"], {
+						Length = 0.5,
+						Goal = {BackgroundColor3 = Color3.fromRGB(54, 54, 54)}
 					})
+				end
+			end)
+			
+			Tab["8"].MouseLeave:Connect(function()
+				Tab.Hover = false
+				
+				if not Tab.Active then
+					Library:Tween(Tab["8"], {
+						Length = 0.5,
+						Goal = {BackgroundColor3 = Color3.fromRGB(74, 74, 74)}
+					})
+				end
+			end)
+			
+			UserInputService.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 and Tab.Hover then
+					if Gui.CurrentTab == Tab and not Gui.Hidden then
+						Library:Tween(Gui["18"], {
+							Length = 0.3,
+							Goal = {Position = UDim2.new(0, 0, 0, 452)}
+						})
+						
+						Library:Tween(Gui["18"], {
+							Length = 0.3,
+							Goal = {Size = UDim2.new(0, 498, 0, 0)}
+						})
+						
+						Gui.Hidden = true
+					else
+						Library:Tween(Gui["18"], {
+							Length = 0.3,
+							Goal = {Position = UDim2.new(0, 0, 0, 0)}
+						})
 
-					Library:Tween(Textbox["21"], {
-						Length = 0.7,
-						Goal = {Size = UDim2.new(0, 84,0, 22)}
-					})
-				end)
-
-				Textbox["21"].FocusLost:Connect(function()
-					Library:Tween(Textbox["21"], {
-						Length = 0.7,
-						Goal = {Position = UDim2.new(0, 350,0, 4)}
-					})
-					
-					Library:Tween(Textbox["21"], {
-						Length = 0.7,
-						Goal = {Size = UDim2.new(0, 45,0, 22)}
-					})
-					
-					local nospacestr = string.gsub(Textbox["21"].Text, " ", "")
-					
-					if nospacestr == "" then
-						Textbox["21"]["TextColor3"] = Color3.fromRGB(103, 103, 103)
-						Textbox["21"]["Text"] = Textbox.PlaceholderText
+						Library:Tween(Gui["18"], {
+							Length = 0.3,
+							Goal = {Size = UDim2.new(0, 498, 0, 452)}
+						})
+						
+						Gui.Hidden = false
 					end
 					
-					pcall(function()
-						options.Callback(Textbox["21"]["Text"])
-					end)
-				end)
-				
-				function Textbox:SetText(name)
-					Textbox["1e"]["Text"] = "  "..name
+					Tab:Activate()
+				end
+			end)
+			
+			function Tab:Activate()
+				if not Tab.Active then					
+					if Gui.CurrentTab ~= nil then
+						Gui.CurrentTab:Deactivate(Tab.Index)
+					end
+
+					Tab.Active = true
+
+					Library:Tween(Tab["8"], {
+						Length = 0.5,
+						Goal = {BackgroundColor3 = options.Color}
+					})
+					
+					if Gui.CurrentTabIndex < Tab.Index then
+						task.spawn(function()
+							task.wait(0.3)
+							Gui["1c"]["Text"] = options.Name
+							Gui["1c"]["Position"] = UDim2.new(0, 498, 0, 5)
+							Tab["1d"]["Position"] = UDim2.new(0, 498, 0, 35)
+							Tab["1d"]["Visible"] = true
+
+							Library:Tween(Gui["1c"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, 14, 0, 5)}
+							})
+
+							Library:Tween(Tab["1d"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, 0, 0, 35)}
+							})
+						end)
+					else
+						task.spawn(function()
+							task.wait(0.3)
+							Gui["1c"]["Text"] = options.Name
+							Gui["1c"]["Position"] = UDim2.new(0, -498, 0, 5)
+							Tab["1d"]["Position"] = UDim2.new(0, -498, 0, 35)
+							Tab["1d"]["Visible"] = true
+
+							Library:Tween(Gui["1c"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, 14, 0, 5)}
+							})
+
+							Library:Tween(Tab["1d"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, 0, 0, 35)}
+							})
+						end)
+					end
+
+					Gui.CurrentTabIndex = Tab.Index
+					Gui.CurrentTab = Tab
 				end
 			end
 
-			Library:ResizeCanvas(Tab["b"])
-			return Textbox
+			function Tab:Deactivate(newtabindex)
+				if Tab.Active then
+					Tab.Active = false
+					
+					if Gui.CurrentTabIndex < newtabindex then
+						Library:Tween(Tab["8"], {
+							Length = 0.5,
+							Goal = {BackgroundColor3 = Color3.fromRGB(74, 74, 74)}
+						})
+
+						task.spawn(function()
+							Library:Tween(Gui["1c"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, -498, 0, 5)}
+							})
+
+							Library:Tween(Tab["1d"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, -498, 0, 35)}
+							})
+
+							task.wait(0.3)
+							Tab["1d"]["Visible"] = false
+						end)
+					else
+						Library:Tween(Tab["8"], {
+							Length = 0.5,
+							Goal = {BackgroundColor3 = Color3.fromRGB(74, 74, 74)}
+						})
+
+						task.spawn(function()
+							Library:Tween(Gui["1c"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, 498, 0, 5)}
+							})
+
+							Library:Tween(Tab["1d"], {
+								Length = 0.3,
+								Goal = {Position = UDim2.new(0, 498, 0, 35)}
+							})
+
+							task.wait(0.3)
+							Tab["1d"]["Visible"] = false
+						end)
+					end
+				end
+			end
+
+			if Gui.CurrentTab == nil then
+				Tab:Activate()
+			end
 		end
 		
 		return Tab
 	end
 	
-	-- Gui Handles
-	-- Nav Close
+	-- Handler
 	do
-		local function titleBarHover(button, hover)
-			if hover then
-				Library:Tween(button, {
-					Length = 0.2,
-					Goal = {ImageColor3 = Color3.fromRGB(136, 103, 177)}
-				})
-			else
-				Library:Tween(button, {
-					Length = 0.2,
-					Goal = {ImageColor3 = Color3.fromRGB(255, 255, 255)}
-				})
-			end
-		end
-		
-		-- Title bar settings
-		do
-			local SettingTab = GUI:Tab({
-				Name = "Settings",
-				Icon = "rbxassetid://11254763826",
-				Hidden = true
-			})
-			
-			
-			GUI["a"].MouseEnter:Connect(function()			
-				titleBarHover(GUI["a"], true)
-			end)
-
-			GUI["a"].MouseLeave:Connect(function()
-				titleBarHover(GUI["a"], false)
-			end)
-			
-			GUI["a"].MouseButton1Click:Connect(function()
-				SettingTab:Activate()
-			end)
-			
-			SettingTab:Section({
-				Name = "Credits",
-			})
-
-			SettingTab:TextLabel({
-				Name = "Scripted by Loco_CTO, BruhOOFBoi",
-				Color = Color3.fromRGB(136, 103, 177)
-			})
-			SettingTab:TextLabel({
-				Name = "Gui Designed by BruhOOFBoi",
-				Color = Color3.fromRGB(136, 103, 177)
-			})
-			
-			SettingTab:Section({
-				Name = "Settings",
-			})
-			
-			SettingTab:Toggle({
-				Name = "Lock Dragging",
-				Default = false,
-				Callback = function(bool)
-					Library.LockDragging = bool
-				end
-			})
-			
-			SettingTab:Slider({
-				Name = "Drag Speed",
-				Min = 0,
-				Max = 100,
-				Default = 10,
-				Callback = function(val)
-					Library.DragSpeed = val/100
-				end
-			})
-			
-			SettingTab:Keybind({
-				Name = "Keybind",
-				Default = Enum.KeyCode.RightShift,
-				Callback = function() return end,
-				UpdateKeyCallback = function(key)
-					GUI.ToggleKey = key
-				end
-			})
-		end
-		
-		-- Nav bar close
-		GUI["33"].MouseEnter:Connect(function()			
-			titleBarHover(GUI["33"], true)
-		end)
-
-		GUI["33"].MouseLeave:Connect(function()
-			titleBarHover(GUI["33"], false)
-		end)
-
-		GUI["33"].MouseButton1Click:Connect(function()
-			GUI.Navagation = false
-			Library:ToggleNav(GUI.Navagation, GUI["27"])
-		end)
-
-		--Nav Open
-		GUI["7"].MouseEnter:Connect(function()
-			titleBarHover(GUI["7"], true)
-		end)
-
-		GUI["7"].MouseLeave:Connect(function()
-			titleBarHover(GUI["7"], false)
-		end)
-
-		GUI["7"].MouseButton1Click:Connect(function()
-			if not GUI.Navagation then
-				GUI.Navagation = true
-				Library:ToggleNav(GUI.Navagation, GUI["27"])
-			end
-		end)
-		
-		-- UI Toggle
-		GUI["9"].MouseEnter:Connect(function()
-			titleBarHover(GUI["9"], true)
-		end)
-		
-		GUI["9"].MouseLeave:Connect(function()
-			titleBarHover(GUI["9"], false)
-		end)
-		
-		GUI["9"].MouseButton1Click:Connect(function()
-			if not Library.TweeningToggle then
-				Library.TweeningToggle = true
-				GUI.Visible = false
-				Library:ToggleGui(GUI.Visible, GUI["2"])
-				Library:ToggleGui(GUI.Visible, GUI["b9"])
-				
-				task.wait(0.52)
-				Library.TweeningToggle = false
-			end
-		end)
-		
-		UserInputService.InputBegan:Connect(function(input)
-			if input.KeyCode == GUI.ToggleKey then
-				if not Library.TweeningToggle then
-					Library.TweeningToggle = true
-					
-					if GUI.Visible then
-						GUI.Visible = false
-						Library:ToggleGui(GUI.Visible, GUI["2"])
-						Library:ToggleGui(GUI.Visible, GUI["b9"])
-					else
-						GUI.Visible = true
-						Library:ToggleGui(GUI.Visible, GUI["2"])
-						Library:ToggleGui(GUI.Visible, GUI["b9"])
-					end
-					
-					task.wait(0.52)
-					Library.TweeningToggle = false
-				end
-			end
-		end)
-	end
-	
-	-- Drag handle
-	do		
-		GUI["2"].MouseEnter:Connect(function()
-			Library.MainFrameHover = true
-		end)
-
-		GUI["2"].MouseLeave:Connect(function()
-			Library.MainFrameHover = false
-		end)
-		
 		UserInputService.InputBegan:Connect(function(input)
 			if Library.MainFrameHover then
 				if input.UserInputType == Enum.UserInputType.MouseButton1 and not Library.Sliding then
-					local ObjectPosition = Vector2.new(Mouse.X - GUI["2"].AbsolutePosition.X, Mouse.Y - GUI["2"].AbsolutePosition.Y)
+					local ObjectPosition = Vector2.new(Mouse.X - Gui["2"].AbsolutePosition.X, Mouse.Y - Gui["2"].AbsolutePosition.Y)
+					
 					while RunService.RenderStepped:wait() and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
 						if not Library.Sliding then
-							if Library.LockDragging then
-								local FrameX, FrameY = math.clamp(Mouse.X - ObjectPosition.X, 0, GUI["1"].AbsoluteSize.X - GUI["2"].AbsoluteSize.X), math.clamp(Mouse.Y - ObjectPosition.Y, 0, GUI["1"].AbsoluteSize.Y - GUI["2"].AbsoluteSize.Y)
-								Library:Tween(GUI["2"], {
-									Goal = {Position = UDim2.fromOffset(FrameX + (GUI["2"].Size.X.Offset * GUI["2"].AnchorPoint.X), FrameY + (GUI["2"].Size.Y.Offset * GUI["2"].AnchorPoint.Y))},
-									Style = Enum.EasingStyle.Linear,
-									Direction = Enum.EasingDirection.InOut,
-									Length = Library.DragSpeed
-								})
-
-								Library:Tween(GUI["b9"], {
-									Goal = {Position = UDim2.fromOffset(FrameX + (GUI["2"].Size.X.Offset * GUI["2"].AnchorPoint.X), FrameY + (GUI["2"].Size.Y.Offset * GUI["2"].AnchorPoint.Y))},
-									Style = Enum.EasingStyle.Linear,
-									Direction = Enum.EasingDirection.InOut,
-									Length = Library.DragSpeed
-								})
-							else
-								Library:Tween(GUI["2"], {
-									Goal = {Position = UDim2.fromOffset(Mouse.X - ObjectPosition.X + (GUI["2"].Size.X.Offset * GUI["2"].AnchorPoint.X), Mouse.Y - ObjectPosition.Y + (GUI["2"].Size.Y.Offset * GUI["2"].AnchorPoint.Y))},
-									Style = Enum.EasingStyle.Linear,
-									Direction = Enum.EasingDirection.InOut,
-									Length = Library.DragSpeed	
-								})
-
-								Library:Tween(GUI["b9"], {
-									Goal = {Position = UDim2.fromOffset(Mouse.X - ObjectPosition.X + (GUI["2"].Size.X.Offset * GUI["2"].AnchorPoint.X), Mouse.Y - ObjectPosition.Y + (GUI["2"].Size.Y.Offset * GUI["2"].AnchorPoint.Y))},
-									Style = Enum.EasingStyle.Linear,
-									Direction = Enum.EasingDirection.InOut,
-									Length = Library.DragSpeed	
-								})
-							end	
+							Library:Tween(Gui["2"], {
+								Goal = {Position = UDim2.fromOffset(Mouse.X - ObjectPosition.X + (Gui["2"].Size.X.Offset * Gui["2"].AnchorPoint.X), Mouse.Y - ObjectPosition.Y + (Gui["2"].Size.Y.Offset * Gui["2"].AnchorPoint.Y))},
+								Style = Enum.EasingStyle.Linear,
+								Direction = Enum.EasingDirection.InOut,
+								Length = Library.DragSpeed	
+							})
 						end
 					end
 				end
 			end
 		end)
+		
+		Gui["2"].MouseEnter:Connect(function()
+			Library.MainFrameHover = true
+		end)
+
+		Gui["2"].MouseLeave:Connect(function()
+			Library.MainFrameHover = false
+		end)
 	end
 	
-	return GUI
+	-- Nav Clock
+	do
+		task.spawn(function()
+			while wait() do
+				local t = tick()
+				local sec = math.floor(t % 60)
+				local min = math.floor((t/60)% 60)
+				local hour = math.floor((t/3600)% 24)
+				
+				if string.len(sec) < 2 then 
+					sec = "0" .. tostring(sec) 
+				end
+
+				if string.len(min) < 2 then 
+					min = "0" .. tostring(min) 
+				end
+				
+				if string.len(hour) < 2 then 
+					hour = "0" .. tostring(hour) 
+				end
+
+				Gui["5"]["Text"] = hour .. ":" .. min..":"..sec
+			end
+		end)
+	end
+	
+	-- Toggle Handler
+	function Gui:Toggled(bool)
+		if not Library.Loaded then
+			return
+		end
+		
+		Gui.TweeningToggle = true
+		if (bool == nil) then
+			if Gui["2"].Visible then
+				Library:Tween(Gui["2"], {
+					Length = 1,
+					Goal = {Size = UDim2.new(0, 498, 0, 0)}
+				})
+
+				task.wait(1)
+				Gui["2"].Visible = false
+			else
+				Gui["2"].Visible = true
+				Library:Tween(Gui["2"], {
+					Length = 1,
+					Goal = {Size = UDim2.new(0, 498, 0, 496)}
+				})
+
+				task.wait(1)
+			end
+		elseif bool then
+			Gui["2"].Visible = true
+			Library:Tween(Gui["2"], {
+				Length = 1,
+				Goal = {Size = UDim2.new(0, 498, 0, 496)}
+			})
+
+			task.wait(1)
+		elseif not bool then
+			Library:Tween(Gui["2"], {
+				Length = 1,
+				Goal = {Size = UDim2.new(0, 498, 0, 0)}
+			})
+
+			task.wait(1)
+			Gui["2"].Visible = false
+		end
+		
+		Gui.TweeningToggle = false
+	end
+	
+	function Gui:TaskBarOnly(bool)		
+		if bool then
+			Library:Tween(Gui["18"], {
+				Length = 0.3,
+				Goal = {Position = UDim2.new(0, 0, 0, 452)}
+			})
+
+			Library:Tween(Gui["18"], {
+				Length = 0.3,
+				Goal = {Size = UDim2.new(0, 498, 0, 0)}
+			})
+
+			Gui.Hidden = true
+		else
+			Library:Tween(Gui["18"], {
+				Length = 0.3,
+				Goal = {Position = UDim2.new(0, 0, 0, 0)}
+			})
+
+			Library:Tween(Gui["18"], {
+				Length = 0.3,
+				Goal = {Size = UDim2.new(0, 498, 0, 452)}
+			})
+
+			Gui.Hidden = false
+		end
+	end
+	
+
+	
+	do
+		UserInputService.InputBegan:Connect(function(input)
+			if input.KeyCode == Gui.ToggleKey then
+				if not Gui.TweeningToggle then
+					Gui:Toggled()
+				end
+			end
+		end)
+	end
+	
+	function Gui:ChangeTogglekey(key)
+		Gui.ToggleKey = key
+	end
+	
+	return Gui
+end
+
+
+function Library:Notify(options)
+	options = Library:Place_Defaults({
+		Name = "Ring Ring",
+		Text = "Notification!!",
+		Icon = "rbxassetid://11401835376",
+		Duration = 5,
+		Callback = function() return end
+	}, options or {})
+	
+	local Notification = {}
+	
+	do
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif
+		Notification["84"] = Instance.new("Frame", LibFrame["81"])
+		Notification["84"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["84"]["Size"] = UDim2.new(0, 257, 0, 0)
+		Notification["84"]["ClipsDescendants"] = true
+		Notification["84"]["Position"] = UDim2.new(0, -41, 0, 0)
+		Notification["84"]["Name"] = [[Notif]]
+		Notification["84"]["ClipsDescendants"] = true
+		Notification["84"]["BorderSizePixel"] = 0
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.UICorner
+		Notification["85"] = Instance.new("UICorner", Notification["84"])
+		Notification["85"]["CornerRadius"] = UDim.new(0, 4)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.ImageLabel
+		Notification["86"] = Instance.new("ImageLabel", Notification["84"])
+		Notification["86"]["BorderSizePixel"] = 0
+		Notification["86"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["86"]["Image"] = options.Icon
+		Notification["86"]["Size"] = UDim2.new(0, 18, 0, 16)
+		Notification["86"]["BackgroundTransparency"] = 1
+		Notification["86"]["Position"] = UDim2.new(0, 10, 0, 5)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.ImageLabel.ThemeColorGradient
+		Notification["87"] = Instance.new("UIGradient", Notification["86"])
+		Notification["87"]["Name"] = [[ThemeColorGradient]]
+		Notification["87"]["Rotation"] = 90
+		Notification["87"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.NotifName
+		Notification["88"] = Instance.new("TextLabel", Notification["84"])
+		Notification["88"]["BorderSizePixel"] = 0
+		Notification["88"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		Notification["88"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["88"]["TextSize"] = 12
+		Notification["88"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["88"]["Size"] = UDim2.new(0, 206, 0, 21)
+		Notification["88"]["Text"] = options.Name
+		Notification["88"]["Name"] = [[NotifName]]
+		Notification["88"]["Font"] = Enum.Font.GothamMedium
+		Notification["88"]["BackgroundTransparency"] = 1
+		Notification["88"]["Position"] = UDim2.new(0, 34, 0, 3)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.NotifName.ThemeColorGradient
+		Notification["89"] = Instance.new("UIGradient", Notification["88"])
+		Notification["89"]["Name"] = [[ThemeColorGradient]]
+		Notification["89"]["Rotation"] = 90
+		Notification["89"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.NotifText
+		Notification["8a"] = Instance.new("TextLabel", Notification["84"])
+		Notification["8a"]["TextWrapped"] = true
+		Notification["8a"]["BorderSizePixel"] = 0
+		Notification["8a"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		Notification["8a"]["TextYAlignment"] = Enum.TextYAlignment.Top
+		Notification["8a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8a"]["TextSize"] = 10
+		Notification["8a"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8a"]["Size"] = UDim2.new(0, 242, 0, 28)
+		Notification["8a"]["Text"] = options.Text
+		Notification["8a"]["Name"] = [[NotifText]]
+		Notification["8a"]["Font"] = Enum.Font.GothamMedium
+		Notification["8a"]["BackgroundTransparency"] = 1
+		Notification["8a"]["Position"] = UDim2.new(0, 10, 0, 23)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack
+		Notification["8b"] = Instance.new("Frame", Notification["84"])
+		Notification["8b"]["BorderSizePixel"] = 0
+		Notification["8b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8b"]["Size"] = UDim2.new(0, 239, 0, 5)
+		Notification["8b"]["Position"] = UDim2.new(0.03501945361495018, 0, 0.7903226017951965, 0)
+		Notification["8b"]["Name"] = [[TimeBarBack]]
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack.Frame
+		Notification["8c"] = Instance.new("Frame", Notification["8b"])
+		Notification["8c"]["BorderSizePixel"] = 0
+		Notification["8c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8c"]["Size"] = UDim2.new(0.5, 0, 1, 0)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack.Frame.ThemeColorGradient
+		Notification["8d"] = Instance.new("UIGradient", Notification["8c"])
+		Notification["8d"]["Name"] = [[ThemeColorGradient]]
+		Notification["8d"]["Rotation"] = 90
+		Notification["8d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack.UIGradient
+		Notification["8e"] = Instance.new("UIGradient", Notification["8b"])
+		Notification["8e"]["Rotation"] = 270
+		Notification["8e"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.UIGradient
+		Notification["8f"] = Instance.new("UIGradient", Notification["84"])
+		Notification["8f"]["Rotation"] = 90
+		Notification["8f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(32, 32, 32)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(25, 25, 25))}
+	end
+	
+	do
+		task.spawn(function()
+			repeat task.wait() until Library.Loaded
+			
+			local Completed = false
+
+			Library:Tween(Notification["84"], {
+				Length = 0.5,
+				Goal = {Size = UDim2.new(0, 257, 0, 62)}
+			})
+
+			Library:Tween(Notification["8c"], {
+				Length = options.Duration,
+				Style = Enum.EasingStyle.Linear,
+				Goal = {Size = UDim2.new(1, 0, 1, 0)}
+			}, function()
+				Completed = true
+			end)
+
+			repeat task.wait() until Completed
+			
+			local Completed = false
+			
+			Library:Tween(Notification["84"], {
+				Length = 0.5,
+				Goal = {Size = UDim2.new(0, 257, 0, 0)}
+			}, function()
+				Completed = true
+			end)
+			
+			repeat task.wait() until Completed
+			
+			options.Callback()
+			Notification["84"]:Destroy()
+		end)
+	end
+end
+
+function Library:ForceNotify(options)
+	options = Library:Place_Defaults({
+		Name = "Ring Ring",
+		Text = "Notification!!",
+		Icon = "rbxassetid://11401835376",
+		Duration = 5,
+		Callback = function() return end
+	}, options or {})
+
+	local Notification = {}
+
+	do
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif
+		Notification["84"] = Instance.new("Frame", LibFrame["81"])
+		Notification["84"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["84"]["Size"] = UDim2.new(0, 257, 0, 0)
+		Notification["84"]["ClipsDescendants"] = true
+		Notification["84"]["Position"] = UDim2.new(0, -41, 0, 0)
+		Notification["84"]["Name"] = [[Notif]]
+		Notification["84"]["ClipsDescendants"] = true
+		Notification["84"]["BorderSizePixel"] = 0
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.UICorner
+		Notification["85"] = Instance.new("UICorner", Notification["84"])
+		Notification["85"]["CornerRadius"] = UDim.new(0, 4)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.ImageLabel
+		Notification["86"] = Instance.new("ImageLabel", Notification["84"])
+		Notification["86"]["BorderSizePixel"] = 0
+		Notification["86"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["86"]["Image"] = options.Icon
+		Notification["86"]["Size"] = UDim2.new(0, 18, 0, 16)
+		Notification["86"]["BackgroundTransparency"] = 1
+		Notification["86"]["Position"] = UDim2.new(0, 10, 0, 5)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.ImageLabel.ThemeColorGradient
+		Notification["87"] = Instance.new("UIGradient", Notification["86"])
+		Notification["87"]["Name"] = [[ThemeColorGradient]]
+		Notification["87"]["Rotation"] = 90
+		Notification["87"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.NotifName
+		Notification["88"] = Instance.new("TextLabel", Notification["84"])
+		Notification["88"]["BorderSizePixel"] = 0
+		Notification["88"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		Notification["88"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["88"]["TextSize"] = 12
+		Notification["88"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["88"]["Size"] = UDim2.new(0, 206, 0, 21)
+		Notification["88"]["Text"] = options.Name
+		Notification["88"]["Name"] = [[NotifName]]
+		Notification["88"]["Font"] = Enum.Font.GothamMedium
+		Notification["88"]["BackgroundTransparency"] = 1
+		Notification["88"]["Position"] = UDim2.new(0, 34, 0, 3)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.NotifName.ThemeColorGradient
+		Notification["89"] = Instance.new("UIGradient", Notification["88"])
+		Notification["89"]["Name"] = [[ThemeColorGradient]]
+		Notification["89"]["Rotation"] = 90
+		Notification["89"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.NotifText
+		Notification["8a"] = Instance.new("TextLabel", Notification["84"])
+		Notification["8a"]["TextWrapped"] = true
+		Notification["8a"]["BorderSizePixel"] = 0
+		Notification["8a"]["TextXAlignment"] = Enum.TextXAlignment.Left
+		Notification["8a"]["TextYAlignment"] = Enum.TextYAlignment.Top
+		Notification["8a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8a"]["TextSize"] = 10
+		Notification["8a"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8a"]["Size"] = UDim2.new(0, 242, 0, 28)
+		Notification["8a"]["Text"] = options.Text
+		Notification["8a"]["Name"] = [[NotifText]]
+		Notification["8a"]["Font"] = Enum.Font.GothamMedium
+		Notification["8a"]["BackgroundTransparency"] = 1
+		Notification["8a"]["Position"] = UDim2.new(0, 10, 0, 23)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack
+		Notification["8b"] = Instance.new("Frame", Notification["84"])
+		Notification["8b"]["BorderSizePixel"] = 0
+		Notification["8b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8b"]["Size"] = UDim2.new(0, 239, 0, 5)
+		Notification["8b"]["Position"] = UDim2.new(0.03501945361495018, 0, 0.7903226017951965, 0)
+		Notification["8b"]["Name"] = [[TimeBarBack]]
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack.Frame
+		Notification["8c"] = Instance.new("Frame", Notification["8b"])
+		Notification["8c"]["BorderSizePixel"] = 0
+		Notification["8c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+		Notification["8c"]["Size"] = UDim2.new(0.5, 0, 1, 0)
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack.Frame.ThemeColorGradient
+		Notification["8d"] = Instance.new("UIGradient", Notification["8c"])
+		Notification["8d"]["Name"] = [[ThemeColorGradient]]
+		Notification["8d"]["Rotation"] = 90
+		Notification["8d"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(132, 65, 232)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(105, 52, 185))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.TimeBarBack.UIGradient
+		Notification["8e"] = Instance.new("UIGradient", Notification["8b"])
+		Notification["8e"]["Rotation"] = 270
+		Notification["8e"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(40, 40, 40)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(45, 45, 45))}
+
+		-- StarterGui.Vision Lib v2.NotifFrame.Notif.UIGradient
+		Notification["8f"] = Instance.new("UIGradient", Notification["84"])
+		Notification["8f"]["Rotation"] = 90
+		Notification["8f"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(32, 32, 32)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(25, 25, 25))}
+	end
+
+	do
+		task.spawn(function()
+			local Completed = false
+
+			Library:Tween(Notification["84"], {
+				Length = 0.5,
+				Goal = {Size = UDim2.new(0, 257, 0, 62)}
+			})
+
+			Library:Tween(Notification["8c"], {
+				Length = options.Duration,
+				Style = Enum.EasingStyle.Linear,
+				Goal = {Size = UDim2.new(1, 0, 1, 0)}
+			}, function()
+				Completed = true
+			end)
+
+			repeat task.wait() until Completed
+
+			local Completed = false
+
+			Library:Tween(Notification["84"], {
+				Length = 0.5,
+				Goal = {Size = UDim2.new(0, 257, 0, 0)}
+			}, function()
+				Completed = true
+			end)
+
+			repeat task.wait() until Completed
+
+			options.Callback()
+			Notification["84"]:Destroy()
+		end)
+	end
+end
+
+function Library:Destroy()
+	LibFrame["1"]:Destroy()
 end
 
 return Library
