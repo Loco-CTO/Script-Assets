@@ -1033,12 +1033,12 @@ function Library:Create(options)
 							local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
 							local value = ((options.Max - options.Min) * percentage) + options.Min
 							value = math.floor(value)
-							Slider.OldVal = value
-							Slider["2b"].Text = value
 
 							if value ~= Slider.OldVal then
 								options.Callback(value)
 							end
+							Slider.OldVal = value
+							Slider["2b"].Text = value
 
 							Library:Tween(Slider["29"], {
 								Length = 0.06,
