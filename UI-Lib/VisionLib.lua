@@ -1077,6 +1077,7 @@ function Library:Create(options)
 			options = Library:Place_Defaults({
 				Name = "Dropdown",
 				Items = {},
+				Default = nil,
 				Callback = function(item) return end
 			}, options or {})
 
@@ -1167,7 +1168,7 @@ function Library:Create(options)
 				Dropdown["2e"]["TextSize"] = 14
 				Dropdown["2e"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
 				Dropdown["2e"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Dropdown["2e"]["Text"] = "  "..options.Name.." > nil"
+				Dropdown["2e"]["Text"] = "  "..options.Name.." > "..tostring(options.Default)
 				Dropdown["2e"]["Font"] = Enum.Font.Gotham
 				Dropdown["2e"]["BackgroundTransparency"] = 1
 
