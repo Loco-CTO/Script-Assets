@@ -9,7 +9,7 @@
 
     Discord: https://discord.gg/Bp7wFcZeUn
     
-]]--                                               
+]]--
 
 -- Services
 local TweenService = game:GetService("TweenService")
@@ -27,6 +27,10 @@ local Library = {
 	Sliding = false,
 	TweeningToggle = false
 }
+local ViewPortSize = workspace.CurrentCamera.ViewportSize
+
+-- Function
+
 
 -- Lib
 function Library:ToggleGui(toggle, frame)
@@ -50,7 +54,7 @@ function Library:ToggleGui(toggle, frame)
 		
 		Library:Tween(frame, {
 			Length = 0.5, 
-			Goal = {Size = UDim2.new(0, 431, 0, 0)}
+			Goal = {Size = UDim2.new(0, 0, 0, 0)}
 		})
 		
 		task.spawn(function()
@@ -156,7 +160,6 @@ function Library:Create(options)
 		GUI["2"]["BackgroundColor3"] = Color3.fromRGB(41, 41, 41)
 		GUI["2"]["Size"] = UDim2.new(0, 431, 0, 506)
 		GUI["2"]["ClipsDescendants"] = true
-		GUI["2"]["BorderSizePixel"] = 0
 		GUI["2"]["Position"] = UDim2.new(0.3449864089488983, 0, 0.09605705738067627, 0)
 		GUI["2"]["Name"] = [[MainFrame]]
 
@@ -979,7 +982,7 @@ function Library:Create(options)
 			do
 				local MouseDown
 				
-				Slider["23"].MouseEnter:Connect(function()
+				Slider["27"].MouseEnter:Connect(function()
 					Slider.Hover = true
 					
 					Library:Tween(Slider["29"], {
@@ -988,7 +991,7 @@ function Library:Create(options)
 					})
 				end)
 				
-				Slider["23"].MouseLeave:Connect(function()
+				Slider["27"].MouseLeave:Connect(function()
 					Slider.Hover = false
 					
 					Library:Tween(Slider["29"], {
@@ -1017,45 +1020,36 @@ function Library:Create(options)
 					end
 				end)
 				
-				UserInputService.InputBegan:Connect(function(key)
+				UserInputService.InputBegan:connect(function(key)
 					if key.UserInputType == Enum.UserInputType.MouseButton1 and Slider.Hover then
 						Library.Sliding = true
 						MouseDown = true
 						
-						task.spawn(function()
-							Library:Tween(Slider["29"], {
-								Length = 0.5,
-								Goal = {BackgroundColor3 = Color3.new(0.780392, 0.780392, 0.780392)}
-							})
-						end)
+						Library:Tween(Slider["29"], {
+							Length = 0.5,
+							Goal = {BackgroundColor3 = Color3.new(0.780392, 0.780392, 0.780392)}
+						})
 					
 						while RunService.RenderStepped:wait() and MouseDown do
 							local percentage = math.clamp((Mouse.X - Slider["27"].AbsolutePosition.X) / (Slider["27"].AbsoluteSize.X), 0, 1)
 							local value = ((options.Max - options.Min) * percentage) + options.Min
 							value = math.floor(value)
-
-							if value ~= Slider.OldVal then
-								options.Callback(value)
-							end
 							Slider.OldVal = value
 							Slider["2b"].Text = value
-
+							options.Callback(value)
 							Library:Tween(Slider["29"], {
 								Length = 0.06,
-								Goal = {Size = UDim2.fromScale(((value - options.Min) / (options.Max - options.Min)), 1)}
+								Goal = {Size = UDim2.fromScale(percentage, 1)}
 							})
-							Library.Sliding = true
 						end
 						Library.Sliding = false
 						
-						task.spawn(function()
-							if Slider.Hover then
-								Library:Tween(Slider["29"], {
-									Length = 0.5,
-									Goal = {BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)}
-								})
-							end
-						end)
+						if Slider.Hover then
+							Library:Tween(Slider["29"], {
+								Length = 0.5,
+								Goal = {BackgroundColor3 = Color3.new(0.403922, 0.403922, 0.403922)}
+							})
+						end
 					end
 				end)
 				
@@ -1063,6 +1057,10 @@ function Library:Create(options)
 					if key.UserInputType == Enum.UserInputType.MouseButton1 then
 						MouseDown = false
 					end
+				end)
+				
+				RunService:BindToRenderStep("visionslider_"..options.Name, Enum.RenderPriority.Input.Value, function()
+					
 				end)
 			end
 			
@@ -1077,7 +1075,6 @@ function Library:Create(options)
 			options = Library:Place_Defaults({
 				Name = "Dropdown",
 				Items = {},
-				Default = nil,
 				Callback = function(item) return end
 			}, options or {})
 
@@ -1168,7 +1165,7 @@ function Library:Create(options)
 				Dropdown["2e"]["TextSize"] = 14
 				Dropdown["2e"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
 				Dropdown["2e"]["Size"] = UDim2.new(0, 400, 0, 30)
-				Dropdown["2e"]["Text"] = "  "..options.Name.." > "..tostring(options.Default)
+				Dropdown["2e"]["Text"] = "  "..options.Name.." > nil"
 				Dropdown["2e"]["Font"] = Enum.Font.Gotham
 				Dropdown["2e"]["BackgroundTransparency"] = 1
 
@@ -2209,6 +2206,13 @@ function Library:Create(options)
 					GUI.ToggleKey = key
 				end
 			})
+			
+			SettingTab:Button({
+				Name = "Destroy Library",
+				Callback = function()
+					GUI:Destroy()
+				end
+			})
 		end
 		
 		-- Nav bar close
@@ -2335,6 +2339,10 @@ function Library:Create(options)
 				end
 			end
 		end)
+	end
+	
+	function GUI:Destroy()
+		GUI["1"]:Destroy()
 	end
 	
 	return GUI
